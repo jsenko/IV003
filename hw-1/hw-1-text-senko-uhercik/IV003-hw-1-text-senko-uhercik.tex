@@ -26,7 +26,7 @@
 \usepackage[utf8]{inputenc}
 % \usepackage[IL2]{fontenc}
 \usepackage{amsmath,amsfonts,amsthm} % Math packages
-
+\usepackage{algpseudocode}
 \usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
 
 \usepackage{sectsty} % Allows customizing section commands
@@ -76,18 +76,35 @@
 
 \section*{Problem 1}
 
-\lipsum[2] % Dummy text
+Nech $X = [x_1, x_2, x_3, \dots, x_n]$ je pole cisel a plati ze $\forall x,y \in X: x \neq y$. \\
+Kazdemu $x_i \in X$ je priradene cislo $w_i$, pre ktore plati:
+\begin{equation}
+    \begin{aligned}
+        w_i > 0 \\
+        \sum_{i = 0}^{n} w_i = 1
+    \end{aligned}
+\end{equation}
+{\em Optimalny prvok} postupnosti je cislo $x_k$ pre ktore plati:
 
-\begin{align} 
-\begin{split}
-(x+y)^3 	&= (x+y)^2(x+y)\\
-&=(x^2+2xy+y^2)(x+y)\\
-&=(x^3+2x^2y+xy^2) + (x^2y+2xy^2+y^3)\\
-&=x^3+3x^2y+3xy^2+y^3
-\end{split}					
-\end{align}
+\begin{equation}
+    \begin{aligned}
+        \sum_{x_i < x_k} w_i < \frac{1}{2} \\
+        \sum_{x_i > x_k} w_i \leq \frac{1}{2}
+    \end{aligned}
+\end{equation}
 
-Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies.
+Problemom je navrh algoritmu ktory riesi najdenie optimalneho prvku s casovou zlozitostou $\Theta(n)$ a poskytnutie dokazu jeho korektnosti a zlozitosti. \\
+\\
+Navrhovane riesenie je modifikovany algoritmus {\em Quick Select} ktory riesi problem najdenia medianu v poli cisel. Tento algoritmus ma obecne zlozitost $\mathcal{O}(n^2)$ pri nevhodnej volbe pivota, avsak pomocou procedury {\em Median of Medians} je mozne najst dostatocne dobry pivot na to, aby mal algoritmus vzdy linearnu zlozitost.  {\em Quick Select} je popisany v nasledujucom texte iba neformalne, s odkazom na relevantne zdroje s dokazom zlozitosti. Zadana uloha  je vyriesena ukazanim redukcie problemu najdenia optimalneho prvku na problem rieseny algoritmom {\em Quick Select + Median of Medians} a dokazom ze tato procedura je vykonatelna v konstantom case. Vysledna zlozitost je teda $\mathcal{O}(n)$. \\
+\\
+Quick Select \\
+
+\begin{algorithmic}[5]
+    \While{true}
+        \State $user \gets beer$
+    \EndWhile
+\end{algorithmic}
+
 
 %----------------------------------------------------------------------------------------
 %	PROBLEM 2
