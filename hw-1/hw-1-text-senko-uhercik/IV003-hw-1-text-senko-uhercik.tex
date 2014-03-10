@@ -71,10 +71,10 @@
 \maketitle % Print the title
 
 %----------------------------------------------------------------------------------------
-%	PROBLEM 1
+%	Príklad 1
 %----------------------------------------------------------------------------------------
 
-\section*{Problem 1}
+\section*{Príklad 1}
 
 \lipsum[2] % Dummy text
 
@@ -89,11 +89,12 @@
 
 Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies.
 
+\pagebreak
 %----------------------------------------------------------------------------------------
-%	PROBLEM 2
+%	Príklad 2
 %----------------------------------------------------------------------------------------
 
-\section*{Problem 2}
+\section*{Príklad 2}
 
 \subsection{Example of list (3*itemize)}
 \begin{itemize}
@@ -119,5 +120,110 @@ Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdie
 \end{enumerate}
 
 %----------------------------------------------------------------------------------------
+
+\pagebreak
+%----------------------------------------------------------------------------------------
+%	Príklad 3
+%----------------------------------------------------------------------------------------
+
+\section*{Príklad 3}
+
+\pagebreak
+%----------------------------------------------------------------------------------------
+%	Príklad 4
+%----------------------------------------------------------------------------------------
+
+\section*{Príklad 4}
+
+\textbf{Tvrdenie 1}: Ľubovoľná postupnosť n operácií INSERT  a MIN-ALL má zložitosť O(n). \\
+
+Uvažujme prirodzené čísla n,k a l, pre ktoré platí n=k+l (n vyjadruje počet operácií)
+
+\[ l = \left\{ 
+  \begin{array}{l l}
+    \frac{n}{2} & \quad \text{ak $n$ je párne}\\
+    \frac{n-1}{2} & \quad \text{ak $n$ is nepárne}
+  \end{array} \right.\]
+
+\[ l = \left\{ 
+  \begin{array}{l l}
+    \frac{n}{2} & \quad \text{ak $n$ je párne}\\
+    \frac{n-1}{2} + 1 & \quad \text{ak $n$ is nepárne}
+  \end{array} \right.\]
+
+
+Uvažujme $k$ oprácií INSERT, každá z týchto operácií vloží do zoznamu rovnaké prirodzené číslo z.
+Po poslednej z týchto operácií bude mať zoznam dĺžku $k$. \\
+
+Cena týchto operácií dohromady je $k$. \\
+
+Po týchto operáciách nasleduje $l$ operácií MIN-ALL.
+Všetky čísla v zozname sú rovnaké, teda všetky čísla v ňom sú minimálne.
+Znamená to, že pri žiadnom z volaní operácie MIN-ALL sa dĺžka zoznamu nezmení.
+
+
+Cena týchto operácií bude 
+\[ l*k = \left\{ 
+  \begin{array}{l l}
+    \frac{n}{2}* \frac{n}{2} = \frac{n^2}{4} & \quad \text{ak $n$ je párne}\\
+    \frac{n-1}{2}* (\frac{n}{2} + 1) = \frac{n^2}{4} + \frac{n}{4} - \frac{1}{2} & \quad \text{ak $n$ is nepárne}
+  \end{array} \right.\]
+
+Z predošlého tvrdenia vyplýva, že špecifikovaná postupnosť operácií bude minimimálne v zložitostnej triede O(n), teda tvrdenie \textbf{neplatí}. \\
+
+\textbf{Tvrdenie 2}: Ľubovoľná postupnosť n operácií INSERT  a MIN-ONE má zložitosť O(n). \\
+Príklad riešime pomocou metódy účtov, kredity pre jednotliv0 operácie stanovíme nasledovne \\
+
+  \begin{tabular}{ | l | c | r | }
+    \hline
+    Operácia & Cena & Kredit \\	
+    \hline
+    INSERT & 1 & 2 \\ 
+    MIN-ONE & |S| & 1 \\
+    \hline
+  \end{tabular}\\
+
+Platí, že vždy počas výpočtu je veľkosť zoznamu rovná počtu kreditov na účte, teda počet kreditov nikdy nebude menší ako 0.
+Celkový kredit po vykonaní n operácií bude menší alebo rovný 2n, teda tvrdenie \textbf{platí}. \\
+
+
+\textbf{Tvrdenie 3}: Ľubovoľná postupnosť n operácií INSERT a DELETE má zložitosť O(n). \\
+
+Uvažujme prirodzené čísla n,k a l, pre ktoré platí n=k+l (n vyjadruje počet operácií
+Hodnotu čísel k a l stanovíme rovnako, ako pri tvrdení 1.
+
+Uvažujme $k$ oprácií INSERT, každá z týchto operácií vloží do zoznamu rovnaké prirodzené číslo z.
+Po poslednej z týchto operácií bude mať zoznam dĺžku $k$. \\
+
+Cena týchto operácií dohromady je $k$. \\
+
+Po týchto operáciách nasleduje $l$ operácií DELETE(y), pričom platí, že y$\neq$z. To má za dôsledok, že po žiadnej z týchto operácií sa dĺžka zoznamu nezmení. Cena týchto operácií bude rovnaká, ako v tvrdení 1.
+Tvrdenie preto \textbf{neplatí}.
+
+\textbf{Tvrdenie 4}: Ľubovoľná postupnosť n operácií INSERT a DELETE taká, že pri každom volaní sa operácia DELETE volá s iným parametrom $i$, má zložitosť má zložitosť O(n). \\
+
+Uvažujme prirodzené čísla n,k a l, pre ktoré platí n=k+l (n vyjadruje počet operácií).
+Hodnotu čísel k a l stanovíme rovnako, ako pri tvrdení 1.
+
+Uvažujme $k$ oprácií INSERT, každá z týchto operácií vloží do zoznamu rovnaké prirodzené číslo z.
+Po poslednej z týchto operácií bude mať zoznam dĺžku $k$. \\
+
+Cena týchto operácií dohromady je $k$. \\
+
+Špecifikujeme množinu M o veľkosti $l$, v ktorej sa nachádzajú prirodzené čísla odližné od $z$.
+Vykonáme $l$ operácií DELETE, pričom pri každej jej volaní predložíme ako parameter iný prvok z množiny M.
+To bude mať za následok, že veľkosť zoznamu sa nezmení. Cena týchto operácií bude rovnaká, ako v tvrdení 1.
+Tvrdenie preto \textbf{neplatí}.
+
+
+
+
+
+\pagebreak
+%----------------------------------------------------------------------------------------
+%	Príklad 5
+%----------------------------------------------------------------------------------------
+
+\section*{Príklad 5}
 
 \end{document}
