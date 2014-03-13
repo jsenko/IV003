@@ -98,21 +98,21 @@ Problemom je navrh algoritmu ktory riesi najdenie optimalneho prvku s casovou zl
 Navrhovane riesenie je modifikovany algoritmus {\em Quick Select} ktory riesi problem najdenia medianu v poli cisel. Tento algoritmus ma obecne zlozitost $\mathcal{O}(n^2)$ pri nevhodnej volbe pivota, avsak pomocou procedury {\em Median of Medians} je mozne najst dostatocne dobry pivot na to, aby mal algoritmus vzdy linearnu zlozitost.  {\em Quick Select} je popisany v nasledujucom texte iba neformalne, s odkazom na relevantne zdroje s dokazom zlozitosti. Zadana uloha  je vyriesena ukazanim redukcie problemu najdenia optimalneho prvku na problem rieseny algoritmom {\em Quick Select + Median of Medians} \cite{blum} a dokazom ze tato procedura je vykonatelna v konstantom case. Vysledna zlozitost je teda $\mathcal{O}(n)$. \\
 \\
 Quick Select \\
-Vrati n-ty najmensi prvok pola, rekurzivne hlada v casti ohranicenej indexami left a right (vratane).
+Vrati index n-teho najmensieho prvku pola, rekurzivne hlada v casti ohranicenej indexami left a right (vratane).
 
 \begin{algorithmic}[1]
     \Function{quick\_select}{$list$, $left$, $right$, $n$}
 %        \If{$left = right$}
 %            \State \Return $list[left]$
 %        \EndIf
-       	\State $pivotIndex \gets$ \Call{random\_between}{$left$, $right$}
-        \State $pivotIndex \gets$ \Call{partition}{$list$, $left$, $right$, $pivotIndex$}
-        \If{$n = pivotIndex$}
+       	\State $pivot \gets$ \Call{random\_between}{$left$, $right$}
+        \State $pivot \gets$ \Call{partition}{$list$, $left$, $right$, $pivot$}
+        \If{$n = pivot$}
             \State \Return $list[n]$
-        \ElsIf{$n < pivotIndex$}
-            \State \Return \Call{quick\_select}{$list$, $left$, $pivotIndex - 1$, $n$}
+        \ElsIf{$n < pivot$}
+            \State \Return \Call{quick\_select}{$list$, $left$, $pivot - 1$, $n$}
         \Else
-            \State \Return \Call{quick\_select}{$list$, $pivotIndex + 1$, $right$, $n$}
+            \State \Return \Call{quick\_select}{$list$, $pivot + 1$, $right$, $n$}
         \EndIf
     \EndFunction
 \end{algorithmic}
@@ -126,11 +126,11 @@ Median Of Medians
 Median of medians: http://www.youtube.com/watch?v=QAbv\_4ndfo4\&list=PLLH73N9cB21W1TZ6zz1dLkyIm50HylGyg \\
 
 \begin{algorithmic}[1]
-    \Function{median\_of\_medians}{$list$}
-        \State $groups \gets$ \Call{split\_into\_groups\_of}{$list$, $5$}
+    \Function{median\_of\_medians}{$list$, $left$, $right$}
+        \State $groups \gets$ \Call{split\_into\_groups\_of}{$list$, $left$, $right$, $5$}
         \State $medians \gets$ \Call{new\_list}{}
         \ForAll{$group \in groups$}
-            \State $median \gets$ \Call{quick\_median}{$group$}
+            \State $median \gets$ \Call{median\_of\_5}{$group$}
             \State \Call{add}{$medians$, $median$}
         \EndFor
        \State $size \gets$ \Call{size}{$medians$}
@@ -139,15 +139,41 @@ Median of medians: http://www.youtube.com/watch?v=QAbv\_4ndfo4\&list=PLLH73N9cB2
 \end{algorithmic}
 
 Rozdelenie do skupin po 5 je O(n) ale najdenie medianu z konstantneho poctu prvkov je O(1).
-Nevieme zlozitost funkcie quick\_select, preto skombinujeme algoritmy a spocitame algoritmu quick\_select\_MoM, ktory vznikne nahradenim  \\
+Nahradime funkciu {\em random\_between} pouzitu na ziskanie indexu pivota algoritmom {\em median\_of\_medians}. Nahradenie sposobi problem pretoze MOM vracia hodnotu a QS ocakava index, ale QS mozeme upravit aby vracal index linearnym vyhladanim danej hodnoty v poli. Takto upraveny algoritmus bude obsahovat dve rekurzivne volania. Jedno vo funkcii MoM (riadok 9, zlozitost je n/5 pretoze sme ziskali n/5 medianov) a druhe priamo v QS (riadok 7 alebo 8). Druhe volanie ma zlozitost 7/10n zodpovedajuce hornemu odhadu poctu prvkov ktore su vacsie alebo naopak mensie ako median medianov (TODO ref. slidy). Ostatne operacie su konstantne alebo linearne.
+Nasledujuca rekurentna rovnica vyjadruje celkovu zlozitost QS (kde c je konstanta - pocet operacii s linearnou zlozitostou):
 
+\begin{equation}
+    \begin{aligned}
+        T(n) = T\left(\frac{n}{5}\right) + T\left(\frac{7n}{10}\right)+c.n \\
+        T(n) = 10.c.n \in \Theta(n)
+    \end{aligned}
+\end{equation}
 
+Redukcia spociva v doplnujucej operacii ktora pre obidve particie zoznamu rozdeleneho podla pivota spocita sucet $w_i$.
+Tieto opracie su znovy vykonatelne v linearnom case. Vysledne sucty urcia na ktorej particii sa algoritmus rekurzivne zavola, pripadne ak plati podmienka pre optimalny prvok postupnosti, vypocet skonci. To znamena ze parameter mozeme odstranit parameter $n$ ktory je po tejto uprave nepotrebny. Vysledny upraveny algoritmus je nasledovny:
 
-Redukcia: vyber pivot a spocitaj sumu na oboch stranach a rekurzuj do vacsej strany \\
-$[x_1, x_2, ... ,x_j, x_{j+1}, ... x_n]$
-pokial je suma na jednej strane vacsia ako 1/2, hladany prvok bude na tej strane + este si treba pametat sucet druhej strany
+\begin{algorithmic}[1]
+    \Function{quick\_select\_mom}{$list$, $left$, $right$}
+       	\State $pivot \gets$ \Call{median\_of\_medians\_index}{$list$, $left$, $right$}
+        \State $pivot \gets$ \Call{partition}{$list$, $left$, $right$, $pivot$}
+        \State $sumLeft \gets$ \Call{sum}{$list$, $left$, $pivot - 1$}
+        \State $sumRight \gets$ \Call{sum}{$list$, $pivot + 1$, $right$}
+        \If{$sumLeft \geq \frac{1}{2}$}
+            \State \Return \Call{quick\_select\_mom}{$list$, $left$, $pivot - 1$}
+        \ElsIf{$sumRight > \frac{1}{2}$}
+            \State \Return \Call{quick\_select\_mom}{$list$, $pivot + 1$, $right$}
+        \Else
+            \State \Return $list[n]$
+        \EndIf
+    \EndFunction
+\end{algorithmic}
 
-
+Korektnost: \\
+Vstupna podmienka \\
+Vystupna podmienka \\
+Parcialna korektnost \\
+Konvergencia \\
+Zlozitost: \\
 
 \pagebreak
 %----------------------------------------------------------------------------------------
