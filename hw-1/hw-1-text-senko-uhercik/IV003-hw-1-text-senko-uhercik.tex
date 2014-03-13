@@ -95,7 +95,7 @@ Kazdemu $x_i \in X$ je priradene cislo $w_i$, pre ktore plati:
 
 Problemom je navrh algoritmu ktory riesi najdenie optimalneho prvku s casovou zlozitostou $\Theta(n)$ a poskytnutie dokazu jeho korektnosti a zlozitosti. \\
 \\
-Navrhovane riesenie je modifikovany algoritmus {\em Quick Select} ktory riesi problem najdenia medianu v poli cisel. Tento algoritmus ma obecne zlozitost $\mathcal{O}(n^2)$ pri nevhodnej volbe pivota, avsak pomocou procedury {\em Median of Medians} je mozne najst dostatocne dobry pivot na to, aby mal algoritmus vzdy linearnu zlozitost.  {\em Quick Select} je popisany v nasledujucom texte iba neformalne, s odkazom na relevantne zdroje s dokazom zlozitosti. Zadana uloha  je vyriesena ukazanim redukcie problemu najdenia optimalneho prvku na problem rieseny algoritmom {\em Quick Select + Median of Medians} a dokazom ze tato procedura je vykonatelna v konstantom case. Vysledna zlozitost je teda $\mathcal{O}(n)$. \\
+Navrhovane riesenie je modifikovany algoritmus {\em Quick Select} ktory riesi problem najdenia medianu v poli cisel. Tento algoritmus ma obecne zlozitost $\mathcal{O}(n^2)$ pri nevhodnej volbe pivota, avsak pomocou procedury {\em Median of Medians} je mozne najst dostatocne dobry pivot na to, aby mal algoritmus vzdy linearnu zlozitost.  {\em Quick Select} je popisany v nasledujucom texte iba neformalne, s odkazom na relevantne zdroje s dokazom zlozitosti. Zadana uloha  je vyriesena ukazanim redukcie problemu najdenia optimalneho prvku na problem rieseny algoritmom {\em Quick Select + Median of Medians} \cite{blum} a dokazom ze tato procedura je vykonatelna v konstantom case. Vysledna zlozitost je teda $\mathcal{O}(n)$. \\
 \\
 Quick Select \\
 
@@ -104,6 +104,22 @@ Quick Select \\
         \State $user \gets beer$
     \EndWhile
 \end{algorithmic}
+
+Quick Select bezi v $\mathcal{O}(n^2)$. \\
+Media of medians: http://www.youtube.com/watch?v=QAbv_4ndfo4&list=PLLH73N9cB21W1TZ6zz1dLkyIm50HylGyg \\
+
+QSMoM: \\
+1. Rozdel A do skupin po 5 prvkov, zotried kazdu skupinu O(n) \\
+2. C je pole tychto medianov tychto skupin O(1) \\
+3. pivot = QSMoM(C, n/5) \\
+4. Rozdel A podla pivota, pozicia pivota je j \\
+5. ak i=j konci \\
+6. rekurzuj do jedneho zo subpoli \\
+
+Redukcia: vyber pivot a spocitaj sumu na oboch stranach a rekurzuj do vacsej strany \\
+[x_1, x_2, ... ,x_j, x_{j+1}, ... x_n]
+pokial je suma na jednej strane vacsia ako 1/2, hladany prvok bude na tej strane + este si treba pametat sucet druhej strany
+
 
 
 \pagebreak
@@ -138,6 +154,7 @@ Quick Select \\
 
 %----------------------------------------------------------------------------------------
 
+<<<<<<< Updated upstream
 \pagebreak
 %----------------------------------------------------------------------------------------
 %	Príklad 3
@@ -242,5 +259,14 @@ Tvrdenie preto \textbf{neplatí}.
 %----------------------------------------------------------------------------------------
 
 \section*{Príklad 5}
+\begin{thebibliography}{1}
+\bibitem{blum} BLUM, Manuel, Robert W. FLOYD, Vaughan PRATT, Ronald L. RIVEST a Robert E. TARJAN.
+Time bounds for selection.
+Journal of Computer and System Sciences. 1973, vol. 7, issue 4, s. 448-461.
+DOI: 10.1016/S0022-0000(73)80033-9.
+Dostupné z: http://linkinghub.elsevier.com/retrieve/pii/S0022000073800339
+
+\bibitem{foo} http://moonflare.com/code/select/select.pdf
+\end{thebibliography}
 
 \end{document}
