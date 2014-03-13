@@ -119,16 +119,27 @@ Vrati n-ty najmensi prvok pola, rekurzivne hlada v casti ohranicenej indexami le
 
 Quick Select bezi v $\mathcal{O}(n^2)$. \\
 
-Ak by bolo mozne deterministicky vybrat vzdy median tak by bol algoritmus vzdy linearny.\\
+Ako by bolo mozne deterministicky vybrat dobry pivot tak, aby bol vysledny algoritmus vzdy linearny.\\
 
 Median Of Medians
 
 Median of medians: http://www.youtube.com/watch?v=QAbv\_4ndfo4\&list=PLLH73N9cB21W1TZ6zz1dLkyIm50HylGyg \\
 
-1. Rozdel A do skupin po 5 prvkov O(n) \\
-2. Zotried kazdu skupinu O(1) \\
-3. C je pole tychto medianov tychto skupin O(1) \\
-4. pivot = QSMoM(C, n/5) \\
+\begin{algorithmic}[1]
+    \Function{median\_of\_medians}{$list$}
+        \State $groups \gets$ \Call{split\_into\_groups\_of}{$list$, $5$}
+        \State $medians \gets$ \Call{new\_list}{}
+        \ForAll{$group \in groups$}
+            \State $median \gets$ \Call{quick\_median}{$group$}
+            \State \Call{add}{$medians$, $median$}
+        \EndFor
+       \State $size \gets$ \Call{size}{$medians$}
+       \State \Return \Call{quick\_select}{$medians$, $0$, $size$, $\frac{n}{2}$}
+    \EndFunction
+\end{algorithmic}
+
+Rozdelenie do skupin po 5 je O(n) ale najdenie medianu z konstantneho poctu prvkov je O(1).
+Nevieme zlozitost funkcie quick\_select, preto skombinujeme algoritmy a spocitame algoritmu quick\_select\_MoM, ktory vznikne nahradenim  \\
 
 
 
