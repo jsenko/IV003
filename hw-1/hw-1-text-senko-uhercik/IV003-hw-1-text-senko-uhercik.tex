@@ -156,8 +156,8 @@ Tieto opracie su znovy vykonatelne v linearnom case. Vysledne sucty urcia na kto
     \Function{quick\_select\_mom}{$list$, $left$, $right$}
        	\State $pivotIndex \gets$ \Call{median\_of\_medians\_index}{$list$, $left$, $right$}
         \State $pivotIndex \gets$ \Call{partition}{$list$, $left$, $right$, $pivotIndex$}
-        \State $sumBottom \gets$ \Call{sum}{$list$, $0$, $pivotIndex - 1$}
-        \State $sumTop \gets$ \Call{sum}{$list$, $pivotIndex + 1$, $length(list)$}
+        \State $sumBottom \gets$ \Call{sum\_w}{$list$, $0$, $pivotIndex - 1$}
+        \State $sumTop \gets$ \Call{sum\_w}{$list$, $pivotIndex + 1$, $length(list)$}
         \If{$sumBottom \geq \frac{1}{2}$}
             \State \Return \Call{quick\_select\_mom}{$list$, $left$, $pivotIndex - 1$}
         \ElsIf{$sumTop > \frac{1}{2}$}
@@ -198,10 +198,30 @@ $X_{mid} = [x_1, x_2, \dots, x_{n-1}, x_n]$\\
 $X_{right} = []$\\
 Trivialne tvrdenie plati. \\
 
-Indukcny krok:
-Predpokladame ze
+Indukcny krok:\\n
+Predpokladame ze pre $k$-te rekurzivne volanie tvrdenie plati na zaciatku funkcie. Analyzujme prebeh funkcie aby sme dokazali ze to bude platit aj pri nasledujucom rekurzivnom volani a zaroven $|X_{mid_k}| > |X_{mid_{k+1}}| $
+V prvom kroku zvolime pivot a ziskame jeho index. Funkcia vrati hodnotu pre ktoru plati: $left \leq pivotIndex \leq right$. Prpominam ze implementacia tejto funkcie nie je podstatna pre korektnost algortmu ale len pre jeho efektivitu. [todo PICK] V druhom kroku sa vola funkcia partition, ktora rozdeli $X_{mid}$ na dve particie:\\
+$X_{lower} = [x_{left}, \dots, x_{pivotIndex-1}]$ \\
+$X_{upper} = [x_{pivotIndex+1}, \dots, x_{right}]$ \\
+Pre ktore plati:
+$\forall x \in X_{lower}, x < x_{pivotIndex}$ a $\forall x \in X_{lower}, x \geq x_{pivotIndex}$
+Tato funkcia je prebrana z existujucich algoritmov Quick Select, Quick Sort apod. a teda nie je potrebne dokazovat jej korektnost.
+Dalsie dva kroky spocitaju sumu vah vsetkych prvkov v zozname nalavo a potom napravo od pivota, teda: \\
 
-Konvergencia \\
+V tomto momente su uz k dispozicii vsetky informacie a nasleduje podmienene vetvenie ktore v dvoch pripadoch rekurzivne zavola danu funkciu a v jednom vrati konkretny vysledok. Budem sa teraz venovat prvym dvom moznostiam a dokazem ze v tychto pripadoch plati indukcna hypoteza a poslednej moznosti sa budem venovat v dalsej sekcii.
+
+Ak plati ze $sumBottom \geq \frac{1}{2}$ potom bude rekurzivne nove rozdelenie nasledujuce: \\
+$X_{left_{k+1}} = X_{left_k}$ \\
+$X_{mid_{k+1}} = X_{lower_k}$\\
+$X_{right_{k+1}} = [x_{pivotIndex}] \sqcup X_{upper_k} \sqcup X_{right_k}$
+
+V tomto pripade plati ze vsetky prvky v left su mensie nez vsetky z mid trivialne, pretoze $X_{left_{k+1}} = X_{left_k}$ a $X_{mid_{k+1}} \sqsubset X_{mid_{k}}$ a teda to vyplyva priamo z ind. hypotezy. To iste plati pre sumu $X_{left_{k+1}}.
+$X_{right_{k+1}} sa sklada z pivota a $X_{upper_k}$ ktore su vacsie ako $X_{mid_{k+1}} co priamo vyplyva zo specifikacie pre partition funkciu. Pre $X_{right_k}$ to vyplyva z indukcnej hypotezy.
+To ze je sucet mensi ako jedna polovica vyplyva zo zadania ktore pozaduje aby bol sucet vah prave jedna. Kedze z podmienky ktora sposobila vetvenie plati ze $sumBottom \geq \frac{1}{2}$ > 1/2 a right tvori zvysok zoznamu, potom jeho suma musi byt mensia ako 1/2. Indukcia plati.
+
+V druhom pripade
+
+Konvergencia a parcialna korektnost:\\
 Zlozitost: \\
 
 \pagebreak
