@@ -231,6 +231,58 @@ Zlozitost: \\
 
 \section*{Príklad 2}
 
+Riešenie tohto algoritmu môžeme zjednodušiť na hľadania najväčšieho prvku v poli
+
+\begin{algorithmic}[1]
+    \Function{search\_ace}{$matrix$}
+        	\State $breakingIndex \gets matrix.size/2$
+	\State $maximum \gets 0$
+	\State $maxX \gets 0$
+	\State $maxY \gets 0$
+	\For{$i=1$ to $n$}
+		\If{$matrix[i][breakingIndex]>maximum$ }
+			\State $maximum \gets matrix[i][breakingIndex]$ 
+			\State $maxX \gets i$
+			\State $maxY \gets breakingIndex$
+		\EndIf
+	\EndFor
+	\For{$i=1$ to $n$}
+		\If{$matrix[breakingIndex][i]>maximum$ }	
+			\State $maximum \gets matrix[breakingIndex][i]$ 
+			\State $maxX \gets breakingIndex$
+			\State $maxY \gets i$
+		\EndIf
+	\EndFor
+
+	\Call{is\_eso}{$maximum$, $maxX$, $maxY$}
+	\If{$isEso$ }
+		\Return $maximum$
+	\Else
+		\Call{make\_submatrix}{$matrix$,$startX$,$startY$,$endX$,$endY$}
+		\Call{search\_ace}{$submatrix$}
+	\EndIf
+
+	
+    \EndFunction
+\\
+\\
+    \Function{is\_eso}{$matrix$,$positionX$,$positionX$}
+	\If{$matrix[positionX][positionX]>something$ }
+	\EndIf
+    \EndFunction
+\\
+\\
+    \Function{find\_highest\_neighbor}{$matrix$,$positionX$,$positionX$}
+	\If{$matrix[positionX][positionX]>something$ }
+	\EndIf
+    \EndFunction
+\\
+\\
+    \Function{make\_submatrix}{$matrix$,$startX$,$startY$,$endX$,$endY$}
+
+    \EndFunction
+\end{algorithmic}
+
 \subsection{Example of list (3*itemize)}
 \begin{itemize}
 	\item First item in a list 
