@@ -154,16 +154,17 @@ Tieto opracie su znovy vykonatelne v linearnom case. Vysledne sucty urcia na kto
 
 \begin{algorithmic}[1]
     \Function{quick\_select\_mom}{$list$, $left$, $right$}
+        \If{$left = right$}
+            \State \Return $list[left]$
+        \EndIf
        	\State $pivotIndex \gets$ \Call{median\_of\_medians\_index}{$list$, $left$, $right$}
         \State $pivotIndex \gets$ \Call{partition}{$list$, $left$, $right$, $pivotIndex$}
         \State $sumBottom \gets$ \Call{sum\_w}{$list$, $0$, $pivotIndex - 1$}
         \State $sumTop \gets$ \Call{sum\_w}{$list$, $pivotIndex + 1$, $length(list)$}
         \If{$sumBottom \geq \frac{1}{2}$}
             \State \Return \Call{quick\_select\_mom}{$list$, $left$, $pivotIndex - 1$}
-        \ElsIf{$sumTop > \frac{1}{2}$}
-            \State \Return \Call{quick\_select\_mom}{$list$, $pivotIndex + 1$, $right$}
         \Else
-            \State \Return $list[n]$
+            \State \Return \Call{quick\_select\_mom}{$list$, $pivotIndex + 1$, $right$}        
         \EndIf
     \EndFunction \\
     \Function{quick\_select\_mom\_start}{$list$}
@@ -219,10 +220,16 @@ V tomto pripade plati ze vsetky prvky v left su mensie nez vsetky z mid trivialn
 $X_{right_{k+1}}$ sa sklada z pivota a $X_{upper_k}$ ktore su vacsie ako $X_{mid_{k+1}}$ co priamo vyplyva zo specifikacie pre partition funkciu. Pre $X_{right_k}$ to vyplyva z indukcnej hypotezy.
 To ze je sucet mensi ako jedna polovica vyplyva zo zadania ktore pozaduje aby bol sucet vah prave jedna. Kedze z podmienky ktora sposobila vetvenie plati ze $sumBottom \geq \frac{1}{2}$ > 1/2 a right tvori zvysok zoznamu, potom jeho suma musi byt mensia ako 1/2. Indukcia plati.
 
-V druhom pripade
+V druhom pripade je nove rozdelenie nasledujuce: \\
+$X_{left_{k+1}} = X_{left_k} \sqcup  X_{lower_k} \sqcup [x_{pivotIndex}]$ \\
+$X_{mid_{k+1}} = X_{upper_k}$ \\
+$X_{right_{k+1}} = $ \\
+Plati ze $sumBottom < \frac{1}{2}$, ale kedze $X_{right}$ sa nemeni, jej sucet je podla indukcnej hypotezy $\leq \frac{1}{2}$.
+Analogicky ako pri predchadzajucej moznosti, indukcny krok a teda cela indukcia plati.
 
-Konvergencia a parcialna korektnost:\\
-Zlozitost: \\
+Konvergencia a parcialna korektnost: \\
+
+Dokaz konvergenie spociva v tom, ze cast $X_{mid}$ sa v kazdom kroku zmensi minimalne o prvok, ktory bol v predchadzajucom kroku pivotom. Tymto sposobom sa v konecnom pocte krokov velkost $X_{mid}$ zredukuje na jediny prvok. V tomto pripade sa vypocet dostane do prvej podmienej vetvy, a kedze pre tento prvok musi platit indukcny krok a teda aj vystupna podmienka, algoritmus v konecnom case vrati spravny vysledok. \qed
 
 \pagebreak
 %----------------------------------------------------------------------------------------
