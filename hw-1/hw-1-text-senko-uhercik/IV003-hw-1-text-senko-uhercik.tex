@@ -240,6 +240,11 @@ Dokaz konvergenie spociva v tom, ze cast $X_{mid}$ sa v kazdom kroku zmensi mini
 
 Riešenie tohto algoritmu môžeme zjednodušiť na hľadania najväčšieho prvku v poli
 
+\newcommand{\pushcode}[1][1]{\hskip\dimexpr#1\algorithmicindent\relax}
+
+\algnewcommand\And{\textbf{and}}
+\algnewcommand\Or{\textbf{or}}
+
 \begin{algorithmic}[1]
     \Function{search\_ace}{$matrix$}
         	\State $breakingIndex \gets matrix.size/2$
@@ -248,6 +253,7 @@ Riešenie tohto algoritmu môžeme zjednodušiť na hľadania najväčšieho prv
 	\State $maxY \gets 0$
 	\For{$i=1$ to $n$}
 		\If{$matrix[i][breakingIndex]>maximum$ }
+			
 			\State $maximum \gets matrix[i][breakingIndex]$ 
 			\State $maxX \gets i$
 			\State $maxY \gets breakingIndex$
@@ -261,21 +267,27 @@ Riešenie tohto algoritmu môžeme zjednodušiť na hľadania najväčšieho prv
 		\EndIf
 	\EndFor
 
-	\Call{is\_eso}{$maximum$, $maxX$, $maxY$}
-	\If{$isEso$ }
-		\Return $maximum$
+	\State $isAce \gets$ \Call{is\_ace}{$maximum$, $maxX$, $maxY$}
+	\If{$isAce$ }
+		\State \Return $maximum$
 	\Else
-		\Call{make\_submatrix}{$matrix$,$startX$,$startY$,$endX$,$endY$}
-		\Call{search\_ace}{$submatrix$}
+		\State $submatrix \gets$ \Call{make\_submatrix}{$matrix$,$startX$,$startY$,$endX$,$endY$}
+		\State \Return \Call{search\_ace}{$submatrix$}
 	\EndIf
 
 	
     \EndFunction
 \\
 \\
-    \Function{is\_eso}{$matrix$,$positionX$,$positionX$}
-	\If{$matrix[positionX][positionX]>something$ }
+    \Function{is\_ace}{$matrix$,$positionX$,$positionX$}
+	\State $current \gets matrix[positionX][positionY]$
+	\If{$current>matrix[positionX + 1 ][positionY] \And  \\
+         		\pushcode[2] current>matrix[positionX - 1 ][positionY] \And
+		current>matrix[positionX][positionY + 1] \And
+		current>matrix[positionX][positionY - 1]$}
+		\State \Return $true$
 	\EndIf
+	
     \EndFunction
 \\
 \\
@@ -289,6 +301,16 @@ Riešenie tohto algoritmu môžeme zjednodušiť na hľadania najväčšieho prv
 
     \EndFunction
 \end{algorithmic}
+
+
+Hlavnou funkciou tohto algoritmu je searchAce.
+V tejto funkcii najprv vyberieme stredný stlĺpec matice a a jej stredný riadok.
+Tento stĺpec a riadok spolu vytvárajú kríž, ktorý rozdeľuje maticu na rovnaké, resp. skoro rovnaké kvadranty (pri sudom n).
+
+V tomto \'kríži\' nájdeme maximálnu hodnotu - zložitosť tejto časti algoritmu je 2n
+
+
+
 
 \subsection{Example of list (3*itemize)}
 \begin{itemize}
