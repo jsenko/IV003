@@ -76,7 +76,7 @@
 
 \section*{Príklad 1}
 
-Nech $X = [x_1, x_2, x_3, \dots, x_n]$ je pole cisel a plati ze $\forall x,y \in X: x \neq y$. \\
+Nech $X = [x_1, x_2, x_3, \dots, x_n]$ je pole cisel dlzky $n, n > 0$ a plati ze $\forall x,y \in X: x \neq y$. \\
 Kazdemu $x_i \in X$ je priradene cislo $w_i$, pre ktore plati:
 \begin{equation}
     \begin{aligned}
@@ -150,28 +150,57 @@ Nasledujuca rekurentna rovnica vyjadruje celkovu zlozitost QS (kde c je konstant
 \end{equation}
 
 Redukcia spociva v doplnujucej operacii ktora pre obidve particie zoznamu rozdeleneho podla pivota spocita sucet $w_i$.
-Tieto opracie su znovy vykonatelne v linearnom case. Vysledne sucty urcia na ktorej particii sa algoritmus rekurzivne zavola, pripadne ak plati podmienka pre optimalny prvok postupnosti, vypocet skonci. To znamena ze parameter mozeme odstranit parameter $n$ ktory je po tejto uprave nepotrebny. Vysledny upraveny algoritmus je nasledovny:
+Tieto opracie su znovy vykonatelne v linearnom case. Vysledne sucty urcia na ktorej particii sa algoritmus rekurzivne zavola, pripadne ak plati podmienka pre optimalny prvok postupnosti, vypocet skonci. To znamena ze parameter mozeme odstranit parameter $n$ ktory je po tejto uprave nepotrebny (kazda postupnost ma unikatny optimalny prvok). Vysledny upraveny algoritmus je nasledovny:
 
 \begin{algorithmic}[1]
     \Function{quick\_select\_mom}{$list$, $left$, $right$}
-       	\State $pivot \gets$ \Call{median\_of\_medians\_index}{$list$, $left$, $right$}
-        \State $pivot \gets$ \Call{partition}{$list$, $left$, $right$, $pivot$}
-        \State $sumLeft \gets$ \Call{sum}{$list$, $left$, $pivot - 1$}
-        \State $sumRight \gets$ \Call{sum}{$list$, $pivot + 1$, $right$}
+       	\State $pivotIndex \gets$ \Call{median\_of\_medians\_index}{$list$, $left$, $right$}
+        \State $pivotIndex \gets$ \Call{partition}{$list$, $left$, $right$, $pivotIndex$}
+        \State $sumLeft \gets$ \Call{sum}{$list$, $left$, $pivotIndex - 1$}
+        \State $sumRight \gets$ \Call{sum}{$list$, $pivotIndex + 1$, $right$}
         \If{$sumLeft \geq \frac{1}{2}$}
-            \State \Return \Call{quick\_select\_mom}{$list$, $left$, $pivot - 1$}
+            \State \Return \Call{quick\_select\_mom}{$list$, $left$, $pivotIndex - 1$}
         \ElsIf{$sumRight > \frac{1}{2}$}
-            \State \Return \Call{quick\_select\_mom}{$list$, $pivot + 1$, $right$}
+            \State \Return \Call{quick\_select\_mom}{$list$, $pivotIndex + 1$, $right$}
         \Else
             \State \Return $list[n]$
         \EndIf
     \EndFunction
+    \Function{quick\_select\_mom\_start}{$list$}
+    	\State \Return \Call{quick\_select\_mom}{$list$, $1$, $lenght(list)$}    
+    \EndFunction
 \end{algorithmic}
 
 Korektnost: \\
-Vstupna podmienka \\
-Vystupna podmienka \\
+Vstupna podmienka $\phi(\langle X \rangle)$ je urcena vztahom (0.1) v zadani problemu.\\
+Vystupna podmienka $\psi(\langle X \rangle, x_k)$ pozaduje, ze vystup algoritmu, $x_k$, je {\em optimalny prvok} podla vztahu (0.2).
 Parcialna korektnost \\
+Vyuzijeme dokaz matematickou indukciou. Zjednodusime ze funkciu median of medians budeme brat ako korektny sposob najdenia medianu (slidy) aj napriek tomu ze obsahuje rekurzivne volanie do tejto procedury. Ak dokazeme korektnost v tomto zjednodusenom pripade, dokazeme to aj pre MOMI. 
+
+Zakladom indukcie bude nasledujuca myslienka:
+Pocas priebehu algoritmu (na zaciatku) je pole $X = [x_0, x_1, x_2, \dots, x_n], n > 0$ rozdelene na tri sekcie (left < right): \\
+$X_{left} = [x_1, x_2, x_3, \dots, x_{left-1}]$\\
+$X_{mid} = [x_{left}, \dots, x_{right}]$\\
+$X_{right} = [x_{right+1}, \dots, x_n]$\\
+Tvrdim, ze pre kazde volanie funkcie QSMOM plati, ze:\\
+$\forall x_i \in X_{left}, \forall x_j \in X_{mid}, x_i < x_j$ and $ \sum w_i < \frac{1}{2} \\$ \\
+podobne \\
+$\forall x_j \in X_{mid}, \forall x_k \in X_{right}, x_j < x_k$ and $ \sum w_k \leq \frac{1}{2} \\$ \\
+
+Pokial dokazeme, ze velkost $X_{mid}$ v kazdom rekurzivnom zavolani funkcie klesne (konvergenciu dokazeme potom), dostaneme sa postupne k casti ktora bude obsahovat prave jeden prvok. Pretoze pren budu platit vyssie uvedene podmienky, bude sa jednat o hladany {\em optimalny prvok postupnosti}. Indukciu budeme teda viest vzhladom k velkosti $X_{mid}$.
+
+Pred samotnym dokazom je potrebne poznamenat, ze predpokladame ze procedury median of median index, partition a um pokladame za totalne korektne. Kedze upraveny algoritmus vychadza z existujucich algoritmov popisanych v predchadzajucom texte ktore tiez pouzivaju dane procedury, ich dokaz je mozne vyhladat v existujucich zdrojoch.
+
+Zaklad indukcie:
+Pri zavolani funkcie quick select mom start (prve volanie QSMoM) je rozdelenie na tri sekcie nasledovne:
+$X_{left} = []$\\
+$X_{mid} = [x_1, x_2, \dots, x_{n-1}, x_n]$\\
+$X_{right} = []$\\
+Trivialne tvrdenie plati. \\
+
+Indukcny krok:
+Predpokladame ze
+
 Konvergencia \\
 Zlozitost: \\
 
