@@ -156,16 +156,16 @@ Tieto opracie su znovy vykonatelne v linearnom case. Vysledne sucty urcia na kto
     \Function{quick\_select\_mom}{$list$, $left$, $right$}
        	\State $pivotIndex \gets$ \Call{median\_of\_medians\_index}{$list$, $left$, $right$}
         \State $pivotIndex \gets$ \Call{partition}{$list$, $left$, $right$, $pivotIndex$}
-        \State $sumLeft \gets$ \Call{sum}{$list$, $left$, $pivotIndex - 1$}
-        \State $sumRight \gets$ \Call{sum}{$list$, $pivotIndex + 1$, $right$}
-        \If{$sumLeft \geq \frac{1}{2}$}
+        \State $sumBottom \gets$ \Call{sum}{$list$, $0$, $pivotIndex - 1$}
+        \State $sumTop \gets$ \Call{sum}{$list$, $pivotIndex + 1$, $length(list)$}
+        \If{$sumBottom \geq \frac{1}{2}$}
             \State \Return \Call{quick\_select\_mom}{$list$, $left$, $pivotIndex - 1$}
-        \ElsIf{$sumRight > \frac{1}{2}$}
+        \ElsIf{$sumTop > \frac{1}{2}$}
             \State \Return \Call{quick\_select\_mom}{$list$, $pivotIndex + 1$, $right$}
         \Else
             \State \Return $list[n]$
         \EndIf
-    \EndFunction
+    \EndFunction \\
     \Function{quick\_select\_mom\_start}{$list$}
     	\State \Return \Call{quick\_select\_mom}{$list$, $1$, $lenght(list)$}    
     \EndFunction
