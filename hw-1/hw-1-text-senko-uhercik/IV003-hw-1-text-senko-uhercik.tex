@@ -215,8 +215,8 @@ $X_{left_{k+1}} = X_{left_k}$ \\
 $X_{mid_{k+1}} = X_{lower_k}$\\
 $X_{right_{k+1}} = [x_{pivotIndex}] \sqcup X_{upper_k} \sqcup X_{right_k}$
 
-V tomto pripade plati ze vsetky prvky v left su mensie nez vsetky z mid trivialne, pretoze $X_{left_{k+1}} = X_{left_k}$ a $X_{mid_{k+1}} \sqsubset X_{mid_{k}}$ a teda to vyplyva priamo z ind. hypotezy. To iste plati pre sumu $X_{left_{k+1}}.
-$X_{right_{k+1}} sa sklada z pivota a $X_{upper_k}$ ktore su vacsie ako $X_{mid_{k+1}} co priamo vyplyva zo specifikacie pre partition funkciu. Pre $X_{right_k}$ to vyplyva z indukcnej hypotezy.
+V tomto pripade plati ze vsetky prvky v left su mensie nez vsetky z mid trivialne, pretoze $X_{left_{k+1}} = X_{left_k}$ a $X_{mid_{k+1}} \sqsubset X_{mid_{k}}$ a teda to vyplyva priamo z ind. hypotezy. To iste plati pre sumu $X_{left_{k+1}}$.
+$X_{right_{k+1}}$ sa sklada z pivota a $X_{upper_k}$ ktore su vacsie ako $X_{mid_{k+1}}$ co priamo vyplyva zo specifikacie pre partition funkciu. Pre $X_{right_k}$ to vyplyva z indukcnej hypotezy.
 To ze je sucet mensi ako jedna polovica vyplyva zo zadania ktore pozaduje aby bol sucet vah prave jedna. Kedze z podmienky ktora sposobila vetvenie plati ze $sumBottom \geq \frac{1}{2}$ > 1/2 a right tvori zvysok zoznamu, potom jeho suma musi byt mensia ako 1/2. Indukcia plati.
 
 V druhom pripade
