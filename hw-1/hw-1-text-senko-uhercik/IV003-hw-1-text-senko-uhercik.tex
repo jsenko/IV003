@@ -331,37 +331,21 @@ Keby sa maximálny prvok mohol nachádzať na hranici v rámci kvadrantu mohli b
 Konvergentnosť.
 Algoritmus skončí v konečnom počte rekurzívnych volaní, pretože veľkosť podmatice (size) sa v každom volaní zmenší $\lceil \frac{size}{2} \rceil$. V prípade, že size dosiahne hodnotu 1, algoritmus skončí, pretože metóda IS\_ACE vráti určite true.
 
+Zložitosť
+Na výpočet zložitosti využijeme Master Theorem. Zložitosť použitého algoritmu je zadaná ako počet operácii porovnania. Tieto závisia na veľkosti strany vstupnej matice. V každom volaní funkcie  sa rekurzívne tento parameter zmenší na polovicu.
+Naviac určenie kvadrantu do ktorého sa algoritmus rekurzívne zavolá vyžaduje nájdenie maximálneho prvku z dvoch polí dĺžky $n$. A nakonie sa vykoná jedna s funkcii IS\_ACE alebo SELECT\_QUADRANT, ktoré majú konštantnú zložitosť $c$. Zložistosť algoritmu je teda:
+
+\begin{equation}
+    \begin{aligned}
+        T(n) = T\left(\frac{n}{2}\right) + 2.n + c \\
+        T(n) \in \mathcal{O}(n)
+    \end{aligned}
+\end{equation}
 
 
+\subsection{Bla Bla}
 
 
-
-
-
-\subsection{Example of list (3*itemize)}
-\begin{itemize}
-	\item First item in a list 
-		\begin{itemize}
-		\item First item in a list 
-			\begin{itemize}
-			\item First item in a list 
-			\item Second item in a list 
-			\end{itemize}
-		\item Second item in a list 
-		\end{itemize}
-	\item Second item in a list 
-\end{itemize}
-
-%------------------------------------------------
-
-\subsection{Example of list (enumerate)}
-\begin{enumerate}
-\item First item in a list 
-\item Second item in a list 
-\item Third item in a list
-\end{enumerate}
-
-%----------------------------------------------------------------------------------------
 
 \pagebreak
 %----------------------------------------------------------------------------------------
@@ -381,7 +365,7 @@ Algoritmus skončí v konečnom počte rekurzívnych volaní, pretože veľkosť
 
 Uvažujme prirodzené čísla n,k a l, pre ktoré platí n=k+l (n vyjadruje počet operácií)
 
-\[ l = \left\{ 
+\[ k = \left\{ 
   \begin{array}{l l}
     \frac{n}{2} & \quad \text{ak $n$ je párne}\\
     \frac{n-1}{2} & \quad \text{ak $n$ is nepárne}
