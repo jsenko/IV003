@@ -283,19 +283,13 @@ Riešenie tohto algoritmu môžeme zjednodušiť na hľadania najväčšieho prv
     \EndFunction
 \\
 \\
-    \Function{is\_eso}{$x$,$y$}
-	\State \Comment{Porovna cislo na danej pozicii z okolitymi 4 prvkami (ak existuju)}
-        \State \Comment{a vrati true ak sa jedna o eso}
-    \EndFunction
+	\Function{is\_eso}{$x$,$y$}
+		\State \Comment{Implementacia vynechana, popis v texte}
+	\EndFunction
 \\
 \\
     \Function{select\_quadrant}{$x$,$y$}
          \State \Comment{Implementacia vynechana, popis v texte}
-    \EndFunction
-\\
-\\
-    \Function{make\_submatrix}{$matrix$,$startX$,$startY$,$endX$,$endY$}
-
     \EndFunction
 \end{algorithmic}
 
@@ -305,6 +299,41 @@ V tejto funkcii najprv vyberieme stredný stlĺpec matice a a jej stredný riado
 Tento stĺpec a riadok spolu vytvárajú kríž, ktorý rozdeľuje maticu na rovnaké, resp. skoro rovnaké kvadranty (pri sudom n).
 
 V tomto \'kríži\' nájdeme maximálnu hodnotu - zložitosť tejto časti algoritmu je 2n
+
+Pred dôkazom korektnosti doplníme korektnosť funkcií, ktoré sme priamo nedefinovali:
+
+IS\_ACE
+Táto funkcia má za úlohu zistiť, či je prvok na zadaných súradniciach v matici eso. Na toto stačia maximálne 4 porovnania so susednými prvkami (ak tieto prvky existujú).
+Výsledná zložitosť patrí do $\mathcal{O}(1)$.
+
+SELECT\_QUADRANT
+Táto funkcia vráti číslo z množiny \{1,2,3,4\}, ktoré reprezentuje 1 zo štyroch možných kvadrantov matice, na ktorých sa funkcia SEARCH\_ACE rekurzívne zavolá. Vstupné parametre sú súradnice maximálneho prvku na {\em kríži}. Funkcia vyhodnotí v ktorom kvadrante sa nachádza najväčší zo štyroch susediacich prvkov (nazveme ho {\em smerodajný prvok}. Tento najväčší prvok sa musí nachádzať mimo strednu kríža, v opačnom prípade, funkcia IS\_ACE vráti true a k tejto funkcii sa vykonávanie nedostane. Túto funkcionalitu je možné implementovať pomocou konštantného počtu porovnaní, čo znamená že výsledná zložitosť patrí do $\mathcal{O}(1)$.
+
+
+
+
+
+Korektnosť
+
+Parciálna korektnosť.
+Vstupná aj výstupná podmienka sú devinované v zadaní TODO.
+Dôkaz korektnosti algoritmu vykonáme matematickou indukciou vzhľadom na počet rekurzívnych volaní.
+Ak argument funkcie SEARCH\_ACE je štvorcová podmatica pôvodnej matice obsahujúca eso , potom kvadrant(podmatica), ktorý algoritmus vyberie a rekurzívne zavolá, tiež obsahuje eso.
+
+bázový krok: funkciu SEARCH\_ACE zavoláme na zadanej matici M nasledovným spôsobom SEARCH\_ACE($M$,$1$,$1$,$|M|$), M triviálne obsahuje eso.
+indukčný krok: 
+Vnútri kvadrantu existuje prvok, ktorý je väčší ako všetky prvky na jeho hranici, konkrétne prvok, na základe ktorého bol kvadrant vybraný funkciou SELECT\_QUADRANT. V závislosti na vybranom kvadrante môže byť časť tejto hranice súčasťou kvadrantu, tvrdenie ale platí stále pre zvyšné prvky. 
+
+Lemma 1: Vzhľadom k tomu, že matica je zaplnená rôznymi prirodzenými číslami, teda obsahuje aj maximálny prvok a tento prvok je s určitosťou eso.
+
+Keby sa maximálny prvok mohol nachádzať na hranici v rámci kvadrantu mohli by sme ho označiť za eso, ale v skutočnosti by mohol susediť s prvkom mimo kvadrantu, ktorý by bol väčší a teda by sa o eso nejednalo. Maximálny prvok v kvadrante je väčší ako ktorýkoľvek prvok na hranici kvadrantu, pretože maximálny prvok musí byť väčší alebo rovný ako {\em smerodajný prvok}. To znamená, že kvadrant, nad ktorým zavoláme rekurzívne funkciu SEARCH\_ACE obsahuje eso, čo znamená, že indukčný krok platí.
+
+Konvergentnosť.
+Algoritmus skončí v konečnom počte rekurzívnych volaní, pretože veľkosť podmatice (size) sa v každom volaní zmenší $\lceil \frac{size}{2} \rceil$. V prípade, že size dosiahne hodnotu 1, algoritmus skončí, pretože metóda IS\_ACE vráti určite true.
+
+
+
+
 
 
 
