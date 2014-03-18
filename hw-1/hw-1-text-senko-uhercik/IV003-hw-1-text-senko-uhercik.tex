@@ -246,54 +246,51 @@ Riešenie tohto algoritmu môžeme zjednodušiť na hľadania najväčšieho prv
 \algnewcommand\Or{\textbf{or}}
 
 \begin{algorithmic}[1]
-    \Function{search\_ace}{$matrix$}
-        	\State $breakingIndex \gets matrix.size/2$
-	\State $maximum \gets 0$
-	\State $maxX \gets 0$
-	\State $maxY \gets 0$
-	\For{$i=1$ to $n$}
-		\If{$matrix[i][breakingIndex]>maximum$ }
-			
-			\State $maximum \gets matrix[i][breakingIndex]$ 
+    \Function{search\_ace}{$matrix$, $startX$, $startY$, $size$}
+        \State $midX \gets startX + \lfloor \frac{size}{2} \rfloor$
+	\State $midY \gets startY + \lfloor \frac{size}{2} \rfloor$
+	\State $maxX \gets 1$
+	\State $maxY \gets 1$
+	\For{$i=startX$ to $startX + size - 1$}
+		\If{$matrix[i][midY]>matrix[maxX][maxY]$ }
 			\State $maxX \gets i$
-			\State $maxY \gets breakingIndex$
+			\State $maxY \gets midY$
 		\EndIf
 	\EndFor
-	\For{$i=1$ to $n$}
-		\If{$matrix[breakingIndex][i]>maximum$ }	
-			\State $maximum \gets matrix[breakingIndex][i]$ 
-			\State $maxX \gets breakingIndex$
+	\For{$i=startY$ to $startY + size - 1$}
+		\If{$matrix[miX][i]>matrix[maxX][maxY]$ }	
+			\State $maxX \gets midX$
 			\State $maxY \gets i$
 		\EndIf
 	\EndFor
 
-	\State $isAce \gets$ \Call{is\_ace}{$maximum$, $maxX$, $maxY$}
-	\If{$isAce$ }
-		\State \Return $maximum$
-	\Else
-		\State $submatrix \gets$ \Call{make\_submatrix}{$matrix$,$startX$,$startY$,$endX$,$endY$}
-		\State \Return \Call{search\_ace}{$submatrix$}
+	
+	\If{\Call{is\_ace}{$maxX$, $maxY$}}
+		\State \Return $matrix[maxX][maxY]$
+	\EndIf
+		
+       \If{\Call{select\_quadrant}{$maxX$, $maxY$} $= 1$}
+		\State \Call{search\_ace}{$matrix$, $startX$, $startY$, $\lfloor \frac{size}{2} \rfloor$}
+        \ElsIf{\Call{select\_quadrant}{$maxX$, $maxY$} $= 2$}
+		\State \Call{search\_ace}{$matrix$, $midX$, $startY$, $\lceil \frac{size}{2} \rceil$}
+        \ElsIf{\Call{select\_quadrant}{$maxX$, $maxY$} $= 3$}
+		\State \Call{search\_ace}{$matrix$, $startX$, $midY$, $\lceil \frac{size}{2} \rceil$}
+        \ElsIf{\Call{select\_quadrant}{$maxX$, $maxY$} $= 4$}
+		\State \Call{search\_ace}{$matrix$, $midX$, $midY$, $\lceil \frac{size}{2} \rceil$}
 	\EndIf
 
 	
     \EndFunction
 \\
 \\
-    \Function{is\_ace}{$matrix$,$positionX$,$positionX$}
-	\State $current \gets matrix[positionX][positionY]$
-	\If{$current>matrix[positionX + 1 ][positionY] \And  \\
-         		\pushcode[2] current>matrix[positionX - 1 ][positionY] \And
-		current>matrix[positionX][positionY + 1] \And
-		current>matrix[positionX][positionY - 1]$}
-		\State \Return $true$
-	\EndIf
-	
+    \Function{is\_eso}{$x$,$y$}
+	\State \Comment{Porovna cislo na danej pozicii z okolitymi 4 prvkami (ak existuju)}
+        \State \Comment{a vrati true ak sa jedna o eso}
     \EndFunction
 \\
 \\
-    \Function{find\_highest\_neighbor}{$matrix$,$positionX$,$positionX$}
-	\If{$matrix[positionX][positionX]>something$ }
-	\EndIf
+    \Function{select\_quadrant}{$x$,$y$}
+         \State \Comment{Implementacia vynechana, popis v texte}
     \EndFunction
 \\
 \\
@@ -337,7 +334,6 @@ V tomto \'kríži\' nájdeme maximálnu hodnotu - zložitosť tejto časti algor
 
 %----------------------------------------------------------------------------------------
 
-<<<<<<< Updated upstream
 \pagebreak
 %----------------------------------------------------------------------------------------
 %	Príklad 3
