@@ -84,7 +84,7 @@ Kazdemu $x_i \in X$ je priradene cislo $w_i$, pre ktore plati:
         \sum_{i = 0}^{n} w_i = 1
     \end{aligned}
 \end{equation}
-{\em Optimalny prvok} postupnosti je cislo $x_k$ pre ktore plati:
+{\em Optimalny prvok postupnosti} (OPP) je cislo $x_k$ pre ktore plati:
 
 \begin{equation}
     \begin{aligned}
@@ -93,37 +93,34 @@ Kazdemu $x_i \in X$ je priradene cislo $w_i$, pre ktore plati:
     \end{aligned}
 \end{equation}
 
-Problemom je navrh algoritmu ktory riesi najdenie optimalneho prvku s casovou zlozitostou $\Theta(n)$ a poskytnutie dokazu jeho korektnosti a zlozitosti. \\
+Problémom je návrh algoritmu, ktorý nájde optimálny prvok s časovou zložitosťou $\Theta(n)$, a poskytnutie dôkazu jeho korektnosti a zložitosti. \\
 \\
-Navrhovane riesenie je modifikovany algoritmus {\em Quick Select} ktory riesi problem najdenia medianu v poli cisel. Tento algoritmus ma obecne zlozitost $\mathcal{O}(n^2)$ pri nevhodnej volbe pivota, avsak pomocou procedury {\em Median of Medians} je mozne najst dostatocne dobry pivot na to, aby mal algoritmus vzdy linearnu zlozitost.  {\em Quick Select} je popisany v nasledujucom texte iba neformalne, s odkazom na relevantne zdroje s dokazom zlozitosti. Zadana uloha  je vyriesena ukazanim redukcie problemu najdenia optimalneho prvku na problem rieseny algoritmom {\em Quick Select + Median of Medians} \cite{blum} a dokazom ze tato procedura je vykonatelna v konstantom case. Vysledna zlozitost je teda $\mathcal{O}(n)$. \\
-\\
-Quick Select \\
-Vrati index n-teho najmensieho prvku pola, rekurzivne hlada v casti ohranicenej indexami left a right (vratane).
+Navrhované riešenie je modifikovaný algoritmus {\em Quick Select} (QS) ktorý rieši problém nájdenia $k$-teho najmenšieho prvku v poli čísel. Tento algoritmus má obecne zložitosť $\mathcal{O}(n^2)$, avšak pomocou metódy {\em Median of Medians} (MoM) je možné nájsť dostatočne dobrý pivot na to, aby mal algoritmus vždy lineárnu zložitost.  QS a MoM sú popísané v nasledujúcom texte iba neformálne, pretože sú to známe algoritmy a ich presný popis je dostupný v materiáloch predmetu a v článku od BLUM et al. \cite{blum} Zadaná úloha  je vyriešená redukciou problému nájdenia OPP na problém riešený algoritmom QS + MoM, s využitím už dokázaných znalostí o ich zložitosti. Táto redukcia je vykonatelná v linárnom čase. Výsledná zlozitost je teda $\mathcal{O}(n)$. \\
+
+\subsection*{Quick Select}
+Vráti $k$-ty najmenší prvok poľa v časti ohraničenej indexami $left$ a $right$ (vrátane). Predpokladáme že pole je neprázdne a indexy platné. \\
 
 \begin{algorithmic}[1]
-    \Function{quick\_select}{$list$, $left$, $right$, $n$}
-%        \If{$left = right$}
-%            \State \Return $list[left]$
-%        \EndIf
-       	\State $pivot \gets$ \Call{random\_between}{$left$, $right$}
-        \State $pivot \gets$ \Call{partition}{$list$, $left$, $right$, $pivot$}
-        \If{$n = pivot$}
-            \State \Return $list[n]$
-        \ElsIf{$n < pivot$}
-            \State \Return \Call{quick\_select}{$list$, $left$, $pivot - 1$, $n$}
+    \Function{quick\_select}{$list$, $k$, $left$, $right$}
+        \If{$left = right$}
+            \State \Return $list[left]$
+        \EndIf
+       	\State $pivotIndex \gets$ \Call{random\_between}{$left$, $right$}
+        \State $pivotIndex \gets$ \Call{partition}{$list$, $left$, $right$, $pivotIndex$}
+        \If{$k = pivotIndex$}
+            \State \Return list[k]
+        \ElsIf{$k < pivotIndex$}
+            \State \Return \Call{quick\_select}{$list$, $k$, $left$, $pivotIndex - 1$}
         \Else
-            \State \Return \Call{quick\_select}{$list$, $pivot + 1$, $right$, $n$}
+            \State \Return \Call{quick\_select}{$list$, $k$, $pivotIndex + 1$, $right$}
         \EndIf
     \EndFunction
 \end{algorithmic}
+\ \\
+QS funguje podobne ako {\em Quick Sort}. V každom volaní sa zvolí náhodný pivot v ohraničenej časti pomocou funkcie RANDOM\_BETWEEN, a následne funkcia PARTITION v lineárnom čase rozdelí podzoznam do dvoch častí. V spodnej sú prvky menšie ako pivot a v druhej väčšie alebo rovné. Analogicky ako pri triedení funkcia patrí do $\mathcal{O}(n^2)$. \\
 
-Quick Select bezi v $\mathcal{O}(n^2)$. \\
-
-Ako by bolo mozne deterministicky vybrat dobry pivot tak, aby bol vysledny algoritmus vzdy linearny.\\
-
-Median Of Medians
-
-Median of medians: http://www.youtube.com/watch?v=QAbv\_4ndfo4\&list=PLLH73N9cB21W1TZ6zz1dLkyIm50HylGyg \\
+\subsection*{Median Of Medians}
+Pomocou tejto funkcie je možné deterministicky vybrať dobrý pivot tak, aby po nahradení RANDOM\_BETWEEN touto procedúrou mal výsledný algoritmus QS + MoM vždy lineárnu zložitosť. \\
 
 \begin{algorithmic}[1]
     \Function{median\_of\_medians}{$list$, $left$, $right$}
@@ -134,13 +131,14 @@ Median of medians: http://www.youtube.com/watch?v=QAbv\_4ndfo4\&list=PLLH73N9cB2
             \State \Call{add}{$medians$, $median$}
         \EndFor
        \State $size \gets$ \Call{size}{$medians$}
-       \State \Return \Call{quick\_select}{$medians$, $0$, $size$, $\frac{n}{2}$}
+       \State \Return \Call{quick\_select}{$medians$, $\frac{n}{2}$, $1$, $size$}
     \EndFunction
 \end{algorithmic}
+\ \\
+Rozdelenie do skupín po 5 je $\mathcal{O}(n)$ ale nájdenie mediánu z konštantného počtu prvkov je $\mathcal{O}(1)$. \\
 
-Rozdelenie do skupin po 5 je O(n) ale najdenie medianu z konstantneho poctu prvkov je O(1).
-Nahradime funkciu {\em random\_between} pouzitu na ziskanie indexu pivota algoritmom {\em median\_of\_medians}. Nahradenie sposobi problem pretoze MOM vracia hodnotu a QS ocakava index, ale QS mozeme upravit aby vracal index linearnym vyhladanim danej hodnoty v poli. Takto upraveny algoritmus bude obsahovat dve rekurzivne volania. Jedno vo funkcii MoM (riadok 9, zlozitost je n/5 pretoze sme ziskali n/5 medianov) a druhe priamo v QS (riadok 7 alebo 8). Druhe volanie ma zlozitost 7/10n zodpovedajuce hornemu odhadu poctu prvkov ktore su vacsie alebo naopak mensie ako median medianov (TODO ref. slidy). Ostatne operacie su konstantne alebo linearne.
-Nasledujuca rekurentna rovnica vyjadruje celkovu zlozitost QS (kde c je konstanta - pocet operacii s linearnou zlozitostou):
+\subsection*{Zložitosť QS + MoM}
+Nahradenie funkcie RANDOM\_BETWEEN spôsobi problém pretože MOM vracia hodnotu a QS očakáva index, ale index môžeme získať lineárnym vyhľadanim prvku v poli, čo nezmení výslednú triedu zložitosti. Takto upravený algoritmus bude obsahovať dve rekurzívne volania. Jedno vo funkcii MoM (zložitosť je $\frac{n}{5}$ pretože sme získali pole mediánov o veľkosti $\frac{n}{5}$) a druhé priamo v QS (riadok 10 alebo 12). Druhé volanie má zložitosť $\frac{7}{10} n$ čo  zodpovedá hornému odhadu počtu prvkov ktoré su väčšie alebo naopak menšie ako medián mediánov, teda pivot (viz slidy). Ostatné operácie sú konštantné alebo lineárne. Nasledujúca rekurentná rovnica vyjadruje celkovú zložitosť algoritmu (kde $c$ je konštanta):
 
 \begin{equation}
     \begin{aligned}
@@ -149,11 +147,11 @@ Nasledujuca rekurentna rovnica vyjadruje celkovu zlozitost QS (kde c je konstant
     \end{aligned}
 \end{equation}
 
-Redukcia spociva v doplnujucej operacii ktora pre obidve particie zoznamu rozdeleneho podla pivota spocita sucet $w_i$.
-Tieto opracie su znovy vykonatelne v linearnom case. Vysledne sucty urcia na ktorej particii sa algoritmus rekurzivne zavola, pripadne ak plati podmienka pre optimalny prvok postupnosti, vypocet skonci. To znamena ze parameter mozeme odstranit parameter $n$ ktory je po tejto uprave nepotrebny (kazda postupnost ma unikatny optimalny prvok). Vysledny upraveny algoritmus je nasledovny:
+\subsection*{Transformácia na algoritmus FIND\_OPTIMAL\_ELEMENT}
+Redukcia spočíva v doplňujúcej operácii, ktorá pre obidve partície zoznamu rozdeleného podľa pivota spočíta súčet ohodnotení pre všetky prvky. Tieto operácie su znovu vykonateľné v lineárnom čase. Výsledné súčty určia na ktorej partícii sa algoritmus rekurzívne zavolá, prípadne ak platí podmienka pre OPP, výpočet skončí. Môžeme odstrániť parameter $k$ ktorý je po tejto úprave nepotrebný (vždy existuje unikátny OPP). Výsledný algoritmus (FOE) je nasledovný: \\
 
 \begin{algorithmic}[1]
-    \Function{quick\_select\_mom}{$list$, $left$, $right$}
+    \Function{find\_optimal\_element}{$list$, $left$, $right$}
         \If{$left = right$}
             \State \Return $list[left]$
         \EndIf
@@ -162,74 +160,107 @@ Tieto opracie su znovy vykonatelne v linearnom case. Vysledne sucty urcia na kto
         \State $sumBottom \gets$ \Call{sum\_w}{$list$, $0$, $pivotIndex - 1$}
         \State $sumTop \gets$ \Call{sum\_w}{$list$, $pivotIndex + 1$, $length(list)$}
         \If{$sumBottom \geq \frac{1}{2}$}
-            \State \Return \Call{quick\_select\_mom}{$list$, $left$, $pivotIndex - 1$}
+            \State \Return \Call{find\_optimal\_element}{$list$, $left$, $pivotIndex - 1$}
         \Else
-            \State \Return \Call{quick\_select\_mom}{$list$, $pivotIndex + 1$, $right$}        
+            \State \Return \Call{find\_optimal\_element}{$list$, $pivotIndex + 1$, $right$}        
         \EndIf
     \EndFunction \\
-    \Function{quick\_select\_mom\_start}{$list$}
-    	\State \Return \Call{quick\_select\_mom}{$list$, $1$, $lenght(list)$}    
+    \Function{find\_optimal\_element\_start}{$list$}
+    	\State \Return \Call{find\_optimal\_element}{$list$, $1$, $lenght(list)$}    
     \EndFunction
 \end{algorithmic}
 
-Korektnost: \\
-Vstupna podmienka $\phi(\langle X \rangle)$ je urcena vztahom (0.1) v zadani problemu.\\
-Vystupna podmienka $\psi(\langle X \rangle, x_k)$ pozaduje, ze vystup algoritmu, $x_k$, je {\em optimalny prvok} podla vztahu (0.2).
-Parcialna korektnost \\
-Vyuzijeme dokaz matematickou indukciou. Zjednodusime ze funkciu median of medians budeme brat ako korektny sposob najdenia medianu (slidy) aj napriek tomu ze obsahuje rekurzivne volanie do tejto procedury. Ak dokazeme korektnost v tomto zjednodusenom pripade, dokazeme to aj pre MOMI. 
+\subsection*{Korektnosť FOE}
+Vstupná podmienka $\phi(\langle X \rangle)$ je určená vzťahom (0.1).\\
+Výstupná podmienka $\psi(\langle X \rangle, x_k)$ požaduje, že výstupom algoritmu je optimalny prvok postupnosti $x_k$ podľa (0.2). \\
+Využijeme dôkaz matematickou indukciou. Základom indukcie je nasledujúca myšlienka: \\
+Počas priebehu algoritmu (na začiatku) je vstupné pole $X = [x_0, x_1, x_2, \dots, x_n], n > 0$ rozdelené na tri sekcie (platí že $left < right$):
 
-Zakladom indukcie bude nasledujuca myslienka:
-Pocas priebehu algoritmu (na zaciatku) je pole $X = [x_0, x_1, x_2, \dots, x_n], n > 0$ rozdelene na tri sekcie (left < right): \\
-$X_{left} = [x_1, x_2, x_3, \dots, x_{left-1}]$\\
-$X_{mid} = [x_{left}, \dots, x_{right}]$\\
-$X_{right} = [x_{right+1}, \dots, x_n]$\\
-Tvrdim, ze pre kazde volanie funkcie QSMOM plati, ze:\\
-$\forall x_i \in X_{left}, \forall x_j \in X_{mid}, x_i < x_j$ and $ \sum w_i < \frac{1}{2} \\$ \\
-podobne \\
-$\forall x_j \in X_{mid}, \forall x_k \in X_{right}, x_j < x_k$ and $ \sum w_k \leq \frac{1}{2} \\$ \\
+\begin{equation}
+    \begin{aligned}
+        X_{left} = [x_1, x_2, x_3, \dots, x_{left-1}] \\
+        X_{mid} = [x_{left}, \dots, x_{right}] \\
+        X_{right} = [x_{right+1}, \dots, x_n] \\
+    \end{aligned}
+\end{equation}
 
-Pokial dokazeme, ze velkost $X_{mid}$ v kazdom rekurzivnom zavolani funkcie klesne (konvergenciu dokazeme potom), dostaneme sa postupne k casti ktora bude obsahovat prave jeden prvok. Pretoze pren budu platit vyssie uvedene podmienky, bude sa jednat o hladany {\em optimalny prvok postupnosti}. Indukciu budeme teda viest vzhladom k velkosti $X_{mid}$.
+Tvrdím, že pre každé volanie funkcie FOE platí, že:
 
-Pred samotnym dokazom je potrebne poznamenat, ze predpokladame ze procedury median of median index, partition a um pokladame za totalne korektne. Kedze upraveny algoritmus vychadza z existujucich algoritmov popisanych v predchadzajucom texte ktore tiez pouzivaju dane procedury, ich dokaz je mozne vyhladat v existujucich zdrojoch.
+\begin{equation}
+    \begin{aligned}
+        \forall x_i \in X_{left}, \forall x_j \in X_{mid}, x_i < x_j \wedge \sum w_i < \frac{1}{2} \\
+        \forall x_j \in X_{mid}, \forall x_k \in X_{right}, x_j < x_k \wedge \sum w_k \leq \frac{1}{2} \\
+    \end{aligned}
+\end{equation}
 
-Zaklad indukcie:
-Pri zavolani funkcie quick select mom start (prve volanie QSMoM) je rozdelenie na tri sekcie nasledovne:
-$X_{left} = []$\\
-$X_{mid} = [x_1, x_2, \dots, x_{n-1}, x_n]$\\
-$X_{right} = []$\\
-Trivialne tvrdenie plati. \\
+Pokiaľ dokážeme, že veľkosť $X_{mid}$ v každom rekurzívnom volaní funkcie klesne, dostaneme sa postupne k strednej časti ktorá bude obsahovať práve jeden prvok. Pretože preň budú platiť vyššie uvedené podmienky, bude sa jednať o hľadaný OPP. \\
+Zaklad indukcie: \\
+Pri zavolaní funkcie FIND\_OPTIMAL\_ELEMENT\_START (iniciálne volanie FOE) je rozdelenie na tri sekcie nasledovné:
 
-Indukcny krok:\\n
-Predpokladame ze pre $k$-te rekurzivne volanie tvrdenie plati na zaciatku funkcie. Analyzujme prebeh funkcie aby sme dokazali ze to bude platit aj pri nasledujucom rekurzivnom volani a zaroven $|X_{mid_k}| > |X_{mid_{k+1}}| $
-V prvom kroku zvolime pivot a ziskame jeho index. Funkcia vrati hodnotu pre ktoru plati: $left \leq pivotIndex \leq right$. Prpominam ze implementacia tejto funkcie nie je podstatna pre korektnost algortmu ale len pre jeho efektivitu. [todo PICK] V druhom kroku sa vola funkcia partition, ktora rozdeli $X_{mid}$ na dve particie:\\
-$X_{lower} = [x_{left}, \dots, x_{pivotIndex-1}]$ \\
-$X_{upper} = [x_{pivotIndex+1}, \dots, x_{right}]$ \\
-Pre ktore plati:
-$\forall x \in X_{lower}, x < x_{pivotIndex}$ a $\forall x \in X_{lower}, x \geq x_{pivotIndex}$
-Tato funkcia je prebrana z existujucich algoritmov Quick Select, Quick Sort apod. a teda nie je potrebne dokazovat jej korektnost.
-Dalsie dva kroky spocitaju sumu vah vsetkych prvkov v zozname nalavo a potom napravo od pivota, teda: \\
+\begin{equation}
+    \begin{aligned}
+        X_{left} = [] \\
+        X_{mid} = [x_1, x_2, \dots, x_{n-1}, x_n] \\
+        X_{right} = [] \\
+    \end{aligned}
+\end{equation}
 
-V tomto momente su uz k dispozicii vsetky informacie a nasleduje podmienene vetvenie ktore v dvoch pripadoch rekurzivne zavola danu funkciu a v jednom vrati konkretny vysledok. Budem sa teraz venovat prvym dvom moznostiam a dokazem ze v tychto pripadoch plati indukcna hypoteza a poslednej moznosti sa budem venovat v dalsej sekcii.
+Triviálne tvrdenie platí. \\
+Indukčný krok: \\
+Predpokladáme že pre $k$-te rekurzívne volanie tvrdenie platí na začiatku funkcie. Analyzujme prebeh funkcie aby sme ukázali že bude platiť aj pri nasledujúcom rekurzívnom volaní $k+1$ a zároveň $|X_{mid_k}| > |X_{mid_{k+1}}|$.
+V prvom kroku zvolíme pivot a získame jeho index. Funkcia vráti hodnotu, pre ktorú platí: $left \leq pivotIndex \leq right$. Poznamenávam že vlastná implementacia tejto funkcie nie je podstatná pre korektnosť algortimu ale len pre jeho efektivitu. V druhom kroku sa volá funkcia PARTITION, ktora rozdelí $X_{mid_k}$ na dve partície:
 
-Ak plati ze $sumBottom \geq \frac{1}{2}$ potom bude rekurzivne nove rozdelenie nasledujuce: \\
-$X_{left_{k+1}} = X_{left_k}$ \\
-$X_{mid_{k+1}} = X_{lower_k}$\\
-$X_{right_{k+1}} = [x_{pivotIndex}] \sqcup X_{upper_k} \sqcup X_{right_k}$
+\begin{equation}
+    \begin{aligned}
+        X_{lower} = [x_{left}, \dots, x_{pivotIndex-1}] \\
+        X_{upper} = [x_{pivotIndex+1}, \dots, x_{right}] \\
+    \end{aligned}
+\end{equation}
 
-V tomto pripade plati ze vsetky prvky v left su mensie nez vsetky z mid trivialne, pretoze $X_{left_{k+1}} = X_{left_k}$ a $X_{mid_{k+1}} \sqsubset X_{mid_{k}}$ a teda to vyplyva priamo z ind. hypotezy. To iste plati pre sumu $X_{left_{k+1}}$.
-$X_{right_{k+1}}$ sa sklada z pivota a $X_{upper_k}$ ktore su vacsie ako $X_{mid_{k+1}}$ co priamo vyplyva zo specifikacie pre partition funkciu. Pre $X_{right_k}$ to vyplyva z indukcnej hypotezy.
-To ze je sucet mensi ako jedna polovica vyplyva zo zadania ktore pozaduje aby bol sucet vah prave jedna. Kedze z podmienky ktora sposobila vetvenie plati ze $sumBottom \geq \frac{1}{2}$ > 1/2 a right tvori zvysok zoznamu, potom jeho suma musi byt mensia ako 1/2. Indukcia plati.
+Pre ktoré platí:
 
-V druhom pripade je nove rozdelenie nasledujuce: \\
-$X_{left_{k+1}} = X_{left_k} \sqcup  X_{lower_k} \sqcup [x_{pivotIndex}]$ \\
-$X_{mid_{k+1}} = X_{upper_k}$ \\
-$X_{right_{k+1}} = $ \\
-Plati ze $sumBottom < \frac{1}{2}$, ale kedze $X_{right}$ sa nemeni, jej sucet je podla indukcnej hypotezy $\leq \frac{1}{2}$.
-Analogicky ako pri predchadzajucej moznosti, indukcny krok a teda cela indukcia plati.
+\begin{equation}
+    \begin{aligned}
+        \forall x \in X_{lower}, x < x_{pivotIndex}
+        \forall x \in X_{lower}, x \geq x_{pivotIndex}
+    \end{aligned}
+\end{equation}
 
-Konvergencia a parcialna korektnost: \\
+Dalšie dve operácie spočítajú sumu ohodnotení všetkých prvkov v zozname naľavo a potom napravo od pivota. V tomto momente sú už k dispozícii všetky informácie a nasleduje podmienené vetvenie, ktoré rekurzívne zavolá FOE. Ak platí že $sumBottom \geq \frac{1}{2}$ potom bude pri dalšom rekurzívnom volaní nové rozdelenie nasledujuce ($\sqcup$ je zjednotenie zoznamov):
 
-Dokaz konvergenie spociva v tom, ze cast $X_{mid}$ sa v kazdom kroku zmensi minimalne o prvok, ktory bol v predchadzajucom kroku pivotom. Tymto sposobom sa v konecnom pocte krokov velkost $X_{mid}$ zredukuje na jediny prvok. V tomto pripade sa vypocet dostane do prvej podmienej vetvy, a kedze pre tento prvok musi platit indukcny krok a teda aj vystupna podmienka, algoritmus v konecnom case vrati spravny vysledok. \qed
+\begin{equation}
+    \begin{aligned}
+        X_{left_{k+1}} = X_{left_k} \\
+        X_{mid_{k+1}} = X_{lower_k} \\
+        X_{right_{k+1}} = [x_{pivotIndex}] \sqcup X_{upper_k} \sqcup X_{right_k}
+    \end{aligned}
+\end{equation}
+
+V tomto prípade platí ze všetky prvky v $X_{left_{k+1}}$ sú menšie než všetky v $X_{mid_{k+1}}$ triviálne, pretože $X_{left_{k+1}} = X_{left_k}$ a $X_{mid_{k+1}} \sqsubset X_{mid_{k}}$ a teda to vyplýva priamo z indukčnej hypotézy. To isté platí pre sumu $X_{left_{k+1}}$. $X_{right_{k+1}}$ sa skladá z pivota a $X_{upper_k}$ ktoré su väčšie ako prvky v $X_{mid_{k+1}}$ čo priamo vyplýva zo špecifikácie pre PARTITION funkciu. Pre $X_{right_k}$ to vyplýva z indukčnej hypotézy. To že je súčet menší ako $\frac{1}{2}$ vyplýva zo zadania, ktoré požaduje, aby bol súčet ohodnotení rovný jednej. Kedže z podmienky ktorá spôsobila vetvenie platí ze $sumBottom \geq \frac{1}{2}$ a $X_{right_{k+1}}$ tvorí zvyšok zoznamu, potom daná suma musi byt mensia ako $\frac{1}{2}$. Indukcia platí.
+
+V druhom pripade je nove rozdelenie nasledujuce:
+
+\begin{equation}
+    \begin{aligned}
+        X_{left_{k+1}} = X_{left_k} \sqcup  X_{lower_k} \sqcup [x_{pivotIndex}] \\
+        X_{mid_{k+1}} = X_{upper_k} \\
+        X_{right_{k+1}} = X_{right_k} \\
+    \end{aligned}
+\end{equation}
+
+Platí že $sumBottom < \frac{1}{2}$, ale kedže $X_{right}$ sa nemení, jej súčet je podľa indukčnej hypotézy $\leq \frac{1}{2}$.
+Analogicky ako pri predchádzajúcej možnosti, indukčný krok a teda celá indukcia platí.
+
+\subsection*{Konvergencia FOE}
+Dôkaz konvergencie spočíva v tom, ze časť $X_{mid}$ sa v každom kroku zmenší minimálne o prvok, ktorý bol v predchadzajúcom kroku pivotom. Týmto spôsobom sa v konečnom počte krokov veľkosť $X_{mid}$ zredukuje na jediný prvok. V tomto prípade sa výpočet dostane do podmienej vetvy na riadku 2, a kedže pre tento prvok musí platiť indukčný krok a teda aj výstupná podmienka, algoritmus v konečnom čase vráti správny výsledok. \qed
+
+\begin{thebibliography}{1}
+\bibitem{blum} BLUM, Manuel, Robert W. FLOYD, Vaughan PRATT, Ronald L. RIVEST a Robert E. TARJAN.
+Time bounds for selection.
+Journal of Computer and System Sciences. 1973, vol. 7, issue 4, s. 448-461.
+DOI: 10.1016/S0022-0000(73)80033-9.
+Dostupné z: http://linkinghub.elsevier.com/retrieve/pii/S0022000073800339
+\end{thebibliography}
 
 \pagebreak
 %----------------------------------------------------------------------------------------
@@ -451,14 +482,6 @@ Tvrdenie preto \textbf{neplatí}.
 %----------------------------------------------------------------------------------------
 
 \section*{Príklad 5}
-\begin{thebibliography}{1}
-\bibitem{blum} BLUM, Manuel, Robert W. FLOYD, Vaughan PRATT, Ronald L. RIVEST a Robert E. TARJAN.
-Time bounds for selection.
-Journal of Computer and System Sciences. 1973, vol. 7, issue 4, s. 448-461.
-DOI: 10.1016/S0022-0000(73)80033-9.
-Dostupné z: http://linkinghub.elsevier.com/retrieve/pii/S0022000073800339
 
-\bibitem{foo} http://moonflare.com/code/select/select.pdf
-\end{thebibliography}
 
 \end{document}
