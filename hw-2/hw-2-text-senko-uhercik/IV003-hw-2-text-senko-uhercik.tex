@@ -1,0 +1,141 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Short Sectioned Assignment
+% LaTeX Template
+% Version 1.0 (5/5/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Frits Wenneker (http://www.howtotex.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[paper=a4, fontsize=11pt]{scrartcl} % A4 paper and 11pt font size
+
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+% \usepackage{fourier} % Use the Adobe Utopia font for the document - comment this line to return to the LaTeX default
+\usepackage[slovak]{babel} % Slovak language/hyphenation
+\usepackage[utf8]{inputenc}
+% \usepackage[IL2]{fontenc}
+\usepackage{amsmath,amsfonts,amsthm} % Math packages
+\usepackage{algpseudocode}
+\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+
+\usepackage{sectsty} % Allows customizing section commands
+\allsectionsfont{\centering \normalfont\scshape} % Make all sections centered, the default font and small caps
+
+\usepackage{fancyhdr} % Custom headers and footers
+\pagestyle{fancyplain} % Makes all pages in the document conform to the custom headers and footers
+\fancyhead{} % No page header - if you want one, create it in the same way as the footers below
+\fancyfoot[L]{} % Empty left footer
+\fancyfoot[C]{} % Empty center footer
+\fancyfoot[R]{\thepage} % Page numbering for right footer
+\renewcommand{\headrulewidth}{0pt} % Remove header underlines
+\renewcommand{\footrulewidth}{0pt} % Remove footer underlines
+\setlength{\headheight}{13.6pt} % Customize the height of the header
+
+\numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{table}{section} % Number tables within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs - comment this line for an assignment with lots of text
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} % Create horizontal rule command with 1 argument of height
+
+\title{	
+\normalfont \normalsize 
+\textsc{IV003, Fakulta Informatiky, Masarykova Univerzita} \\ [25pt] % Your university, school and/or department name(s)
+\horrule{0.5pt} \\[0.4cm] % Thin top horizontal rule
+\huge Homework 2 \\ % The assignment title
+\horrule{2pt} \\[0.5cm] % Thick bottom horizontal rule
+}
+
+\author{Jakub Senko, Štefan Uherčík} % Your name
+
+\date{\normalsize\today} % Today's date or a custom date
+
+\begin{document}
+
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+%	Príklad 1
+%----------------------------------------------------------------------------------------
+
+\section*{Príklad 1}
+
+Zaveďme všeobecnú reprezentáciu budov. Každá uvažovaná budova sa dá reprezentovať ako množina dvojíc $(x_k, h_k)$, určujúcich výšku budovy $h$ na súradnici $x$. Zápis sa dá zjednodušiť usporiadaním bodov vzostupne podľa $x$. Stačí uvažovať len tie dvojice, ktoré označujú miesto, v ktorom nastáva zmena výšky budovy. Tento zápis je ekvivalentný so zápisom použitým v zadaní
+
+\begin{equation}
+    \begin{aligned}
+        (1, \boldsymbol{5}, 5) \sim ((1, 5), (5, 0)) \\
+    \end{aligned}
+\end{equation}
+
+ide len o vnútornú reprezentáciu za účelom zjednodušenia algoritmu. \\
+\\
+
+\subsection*{Merge}
+
+Uvažujme algoritmus MERGE, ktorý z reprezentácie dvoch budov vypočíta reprezentáciu ich siluety. \\
+\\
+Algoritmus využíva object BUILDING\_ITERATOR pomocou ktorého je možné postupne prechádzat reprezentáciou danej budovy. Obsahuje tri  metódy. \\
+NEXT\_COORDINATE\_EXISTS a NEXT\_COORDINATE\_POSITION sú triviálne a neposúvajú pozíciu iterátora. Tretia metóda, GET\_HEIGHT($x$) vráti výšku budovy na zadanej súradnici. Táto metóda spôsobí dostatočný posun iterátora v prípade, že zadaná pozícia je väčšia alebo rovná ako NEXT\_COORDINATE\_POSITION. Kedže iterátor je jednorázový, túto metódu je nie je možné zavolať s argumentom menším ako v predchádzajúcom volaní. Iterátor si jednoducho pamätá poslednú výšku. \\
+\\
+Samotný MERGE pracuje s dvoma iterátormi, pre každú budovu jeden a výstup postupne ukladá do samostatného zoznamu. Základom je {\em while} smyčka, ktorá sa vykoná ak aspoň pre jeden s iterátorov platí NEXT\_COORDINATE\_EXISTS.
+Algoritmus potom vybere menšie $x$ z NEXT\_COORDINATE\_POSITION a zavolá metódu GET\_HEIGHT na oboch iterátoroch. Následne vybere väčšiu z výšok, $h$ a zavolá funkciu TRY\_ADD, ktorá jednoducho vloží novú súradnicu $(x, h)$ do výsledného zoznamu v prípade, že sa výška siluety zmenila (čo nemusí nastať). \\
+\\
+Tento algoritmus funguje pre ľubovolné reprezentácie s dĺžkou $n_1, n_2$ v čase $\mathcal{O}(n_1 + n_2)$, čo je $\mathcal{O}(n)$ pre budovy s rovnako veľkou reprezentáciou. Zdôvodnenie je jednoduché - využíva jednosmerný iterátor na jedno použitie pre  každú reprezentáciu - a teda každú súradnicu spracuje práve raz. Algoritmus je konečný pretože pri každom priechode cyklom metóda GET\_HEIGHT posunie aspoň jeden z iterátorov. \\
+\\
+
+\subsection*{Rozdeľ a panuj}
+
+Výslednú siluetu dosiahneme aplikovaním funkcie MERGE na vhodné podproblémy. Toto delenie funguje rovnako ako pri algoritme {\em merge sort}. Funkcia COMPUTE\_SILHOUETTE zoberie ako argument množinu reprezentácii budov. Ak táto množina obsahuje jednu budovu, tak ju vráti. Ak dve budovy, zavolá na nich MERGE a vráti výsledok. Ak viac, rozdelí množinu na dve rovnaké (s rozdielom jednej budovy v prípade nepárneho počtu) množiny, rekurzívne sa na oboch zavolá a výsledok znovu spojí pomocou MERGE a vráti. Týmto spôsobom funkcia COMPUTE\_SILHOUETTE vždy vráti merge všetkých spojich argumentov (merge nezávisí na poradí). \\
+\\
+Zložitosť závisí na počte MERGE operácii a veľkosti ich vstupu. Na každej úrovni rekurzie je suma veľkosti všetkých reprezentácií rovnaká ($n$ dĺžky 2 na začiatku vs dve dlhé $n$ na konci, kde $n$ je počet budov) a počet úrovní je $\log_2 n$. Výsledná zložitosť je teda $\mathcal{O}(n \log n)$
+
+\pagebreak
+
+%----------------------------------------------------------------------------------------
+%	Príklad 2
+%----------------------------------------------------------------------------------------
+
+\section*{Príklad 2}
+
+\pagebreak
+
+%----------------------------------------------------------------------------------------
+%	Príklad 3
+%----------------------------------------------------------------------------------------
+
+\section*{Príklad 3}
+
+\pagebreak
+
+%----------------------------------------------------------------------------------------
+%	Príklad 4
+%----------------------------------------------------------------------------------------
+
+\section*{Príklad 4}
+
+\pagebreak
+
+%----------------------------------------------------------------------------------------
+%	Príklad 5
+%----------------------------------------------------------------------------------------
+
+\section*{Príklad 5}
+
+\end{document}
