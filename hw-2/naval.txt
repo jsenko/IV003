@@ -1,0 +1,115 @@
+Príklad 2
+
+Pre riešenie tohto problému existuje jednoduchý rekurzívny algoritmus, jeho zložitosť je však exponenciálna z dôvodu opakovaného volania funkcie na rovnakých podproblémoch. Aby sme tomuto zabránili, využili sme závislosti medzi jednotlivými volaniami funkcie IS_SENTENCE. Volania funkcie IS_SENTENCE s konkrétnymi parametrami budeme ukladať do dátovej štruktúry typu
+asociatívne pole (hash tabulka). Vyhľadávanie v hash tabulke má konštantnú zložitosť, preto aj každé volanie funkcie IS_SENTENCE s rovnakým parametrom bude mať konštantnú zložitosť.
+
+
+IS_SENTENCE(w[1..n]) do
+	items = [] of boolean;
+	items.add(DICT(w[1..n])); 
+	for i = 1 to n do
+		item = IS_SENTENCE(w[1 .. i]) logical_and DICT(w[i + 1 .. n]);
+		items.add(item);
+	od
+	
+	return apply logical_or on items;
+od
+
+
+asociatívne pole IS_SENTENCE (Map<String,Boolean>)
+V nasledujúcom algoritme využívame techniku dynamického programovania. Štruktúra IS_SENTENCE plní rovnakú funkciu ako metóda IS_SENTENCE v predchádzajúcom príklade, rozdiel je však v tom, že každý prístup k nej bude mať konštantnú zložitosť
+
+
+input: w[1..n]
+
+for i = 1 .. n do
+	subresults = [] of boolean;
+	subresults.add(DICT(w[1..i]));
+	for j = 1 .. i - 1 do 
+		subresult = IS_SENTENCE(w[1 .. j]) logical_and DICT(w[j + 1 .. i - i]);
+		subresults.add(subresult);
+	od
+	IS_SENTENCE(w[1..i]) = apply logical_or on subresults;
+	return  
+od
+
+Zložitosť:
+O(n^2)
+
+
+Príklad 3
+
+
+
+pole pravdepodobností: C[p(1),..,p(n)]
+k - počet hláv
+PVD - pravdepodobnostná funkcia
+
+jednoduchý rekurzívny algoritmus:
+PVD(C[p1,..,pn],k) do
+	
+	if(k=0) return PVD(C[p(1),..,p(n-1)],0)*(1-p(n));
+	if(k=n) return PVD(C[p(1),..,p(n-1)],k-1)*p(n);
+	return PVD(C[p(1),..,p(n-1)],k-1)*p(n)
+			+ PVD(C[p(1),..,p(n-1)],k)*(1-p(n));
+
+
+od
+
+
+technika dynamického programovania
+vytvorím asociatívne pole typu Map<Pair<Float[],Integer>,Integer> s názvom PVD
+
+PVD([p(1)],0) = p1
+PVD([p(1)],1) = (1-p1);
+
+for i = 1 .. n do 
+	bottom = max(0,k-(n-i));
+	up = min(i,k);
+	for j = bottom .. up do 
+		if(k=0) 
+			PVD(C[p(1),..,p(i-1)],0)*(1-p(i));
+		elseif(k=n)
+			PVD(C[p(1),..,p(i-1)],j-1)*p(i);
+		else PVD(C[p(1),..,p(i-1)],j-1)*p(i)
+			+ PVD(C[p(1),..,p(i-1)],j)*(1-p(i));
+	od
+od
+
+
+Príklad 5
+Hladový algoritmus nenájde správne riešenie pre druhý a tretí problém.
+Protipríklad:
+Dokument s dĺžkou riadku: 12
+Zoznam slov obsahuje slová s dĺžkami 5,4,4,12
+
+Algoritmus umiestni slová nasledovne:
+5,4
+4
+12
+
+Druhý slovný problém:
+Celková penalizácia bude 3^2 + 8^2 + 0 = 9 + 64 = 73
+
+Optimálne riešenie je však:
+5
+4,4
+12
+pri ktorom bude celková penalizácia 7^2 + 4^2 = 49 + 16 = 64
+
+Tretí slovný problém:
+Celková penalizácia bude: max(3,8,0) = 8
+
+Optimálne riešenie je však:
+5
+4,4
+12
+pri ktorom bude celková penalizácia max(7,4,0) = 7
+
+
+
+
+
+
+
+
