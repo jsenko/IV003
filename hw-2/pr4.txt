@@ -1,0 +1,132 @@
+rekurzÌvny algoritmus
+
+function bestPrice(lastIndexOfC,freePlaces[]) do
+
+	if hasLastToFill(freePlaces) then
+			indexOf1 = index of number 1 in array
+			chosenItems is array of 0;
+			fill chosenItems with values of 0;
+			chosenItems[1] = indexOf1;
+			return (C[1][indexOf1],chosenItems);
+	fi
+
+	values is array of pair(number , chosenItems); 
+	//number: price
+	//chosenItems is array for example [0,0,1,2]
+
+	for i = 1 .. freePlaces.size do 
+		
+		if(freePlaces[i] != 0) then
+		
+			freePlacesCopy = freePlaces;
+			
+			freePlacesCopy[i] = freePlacesCopy[i] - 1;
+			
+			pref = bestPrice(lastIndexOfC - 1,freePlacesCopy[]);
+			
+			values[i].number = pref.number + C[lastIndexOfC][i]; 
+			values[i].chosenItems[lastIndexOfC] = i;
+		fi
+	od
+	
+	highestValueIndex = index of highest value in values[1].number .. values[values.size].number;
+	
+	return values[highestValueIndex];
+
+od
+
+function hasLastToFill(freePlaces[]) do
+	return highest value in freePlaces is 1 and
+		(freePlaces.size - 1) items in freePlaces is equal to 0
+od
+
+Technika dynamickÈho programovania
+
+VytvorÌm ötrukt˙ru bestPrice, ktor· bude typu asociatÌvne pole
+kæ˙Ëe bud˙ typu Pair<Integer,Integer []>
+(lastIndexOfC,freePlaces [])
+prv· hodnota oznaËuje index riadku v poli C
+druh· hodnota bude typu pole, jeho dÂûka bude zodpovedaù poËtu autosalÛnov
+hodnota na indexe i bude zodpovedaù poËtu ·ut, ktorÈ je moûnÈ eöte predaù do autosalÛnu s ËÌslom i
+
+a = poËet autosalÛnov
+
+hodnoty bud˙ typu Pair<Integer,Integer []>
+(price,distribution [])
+prv· hodnota znaËÌ vypoËÌtan˙ najlepöiu celkov˙ cenu
+druh· hodnota bude typu pole, jeho dÂûka bude zodpovedaù poËtu riadkov v poli C,
+hodnoty v Úom bud˙ sl˙ûiù na urËenie toho, do ktorÈho salÛnu bude predanÈ auto s indexom na ktorom je prvok umiestnen˝
+0 bude znaËiù, ûe auto zatiaæ nie je priradenÈ do ûiadneho salÛnu, 1 aû a bude znaËiù konkrÈtny autosalÛn
+
+
+
+function countBestPrice(C) do
+
+	for i = 1 .. C.rows do
+		
+		combinations = n·jdeme vöetky kombin·cie pr·ve a ËÌsel z N0, ktorÈ s˙ menöie ako C.rows/a, ktorÈ d·vaj˙ s˙Ëet i; //kaûd˝ prvok bude zoznam o dÂûke a
+				
+		permutations = []
+		foreach combination:combinations do
+			perm = vöetky permut·cie zoznamu combination
+			permutations.addAll(perm);
+		od
+		
+		foreach permutation:permutations do
+		
+			items = [] of (price,distribution [])
+		
+			if hasLastToFill(freePlaces) then
+				indexOf1 = index of number 1 in array
+				chosenItems is array of 0;
+				fill chosenItems with values of 0;
+				chosenItems[1] = indexOf1;
+				return (C[1][indexOf1],chosenItems);
+			fi
+				for j = 1 .. permutation.size do
+					modifiedPermutation = copy of permutation
+					if(modifiedPermutation[j]>0) then
+						modifiedPermutation[j] = modifiedPermutation[j] - 1;
+						
+						item it;
+						aPrice = bestPrice(i-1,modifiedPermutation);
+						it.price = aPrice.price + C[i][j];
+						it.distribution = aPrice.distribution;
+						it.distribution[i] = j;
+						items.add(it)
+					fi
+					
+				od
+				
+				highestValueIndex = index najvacsej hodnoty spomedzi items.price;
+		
+				bestPrice[(i,permutation)] = items[highestValueIndex];
+				
+			endelse	
+		od
+		
+	od
+
+	return bestPrice with key(C.rows);
+od
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
