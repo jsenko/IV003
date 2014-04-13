@@ -114,6 +114,44 @@ Zložitosť závisí na počte MERGE operácii a veľkosti ich vstupu. Na každe
 
 \section*{Príklad 2}
 
+Pre riešenie tohto problému existuje jednoduchý rekurzívny algoritmus, jeho zložitosť je však exponenciálna z dôvodu opakovaného volania funkcie na rovnakých podproblémoch.
+Aby sme tomuto zabránili, využili sme závislosti medzi jednotlivými volaniami funkcie IS\_SENTENCE. Volania funkcie IS\_SENTENCE s konkrétnymi parametrami budeme ukladať do dátovej štruktúry typu asociatívne pole (hash tabulka). Vyhľadávanie v hash tabulke má konštantnú zložitosť, preto aj každé volanie funkcie IS\_SENTENCE s rovnakým parametrom bude mať konštantnú zložitosť. \\
+
+\begin{algorithmic}[1]
+    \Function{is\_sentence}{$w[1..n]$}
+        \State items = [] of boolean
+        \State items.add(DICT(w[1..n]));
+        \For{i = 1 to n}
+        	\State item = IS\_SENTENCE(w[1 .. i]) logical\_and DICT(w[i + 1 .. n]);
+		\State items.add(item);
+        \EndFor
+        \State \Return apply logical\_or on items;
+    \EndFunction
+\end{algorithmic}
+\ \\
+
+asociatívne pole IS\_SENTENCE (Map<String,Boolean>)
+V nasledujúcom algoritme využívame techniku dynamického programovania.
+Štruktúra IS\_SENTENCE plní rovnakú funkciu ako metóda IS\_SENTENCE v predchádzajúcom príklade, rozdiel je však v tom, že každý prístup k nej bude mať konštantnú zložitosť \\
+\\
+\begin{algorithmic}[1]
+    \Function{is\_sentence}{$w[1..n]$}
+    	\For{i = 1 .. n}
+    		\State subresults = [] of boolean;
+		\State subresults.add(DICT(w[1..i]));
+    		\For{j = 1 .. i - 1}
+    			\State subresult = IS\_SENTENCE(w[1 .. j]) logical\_and DICT(w[j + 1 .. i - i]);
+    			\State subresults.add(subresult);
+    		\EndFor
+    		\State \Return IS\_SENTENCE(w[1..i]) = apply logical\_or on subresults;
+	\EndFor
+    \EndFunction
+\end{algorithmic}
+\ \\
+ 
+Zložitosť:
+$\mathcal{O}(n^2)$
+
 \pagebreak
 
 %----------------------------------------------------------------------------------------
@@ -121,6 +159,48 @@ Zložitosť závisí na počte MERGE operácii a veľkosti ich vstupu. Na každe
 %----------------------------------------------------------------------------------------
 
 \section*{Príklad 3}
+
+pole pravdepodobností: $C[p(1),..,p(n)]$\\
+$k$ - počet hláv\\
+PVD - pravdepodobnostná funkcia\\
+
+jednoduchý rekurzívny algoritmus: \\
+
+\begin{algorithmic}[1]
+    \Function{PVD}{C[p1,..,pn],k}
+        \If{k=0}
+            \State \Return PVD(C[p(1),..,p(n-1)],0)*(1-p(n));
+        \EndIf
+        \If{k=n}
+            \State \Return PVD(C[p(1),..,p(n-1)],k-1)*p(n);
+        \EndIf
+        \State \Return PVD(C[p(1),..,p(n-1)],k-1)*p(n) + PVD(C[p(1),..,p(n-1)],k)*(1-p(n));
+    \EndFunction
+\end{algorithmic}
+\ \\
+
+technika dynamického programovania
+vytvorím asociatívne pole typu Map<Pair<Float[],Integer>,Integer> s názvom PVD\\
+
+\begin{algorithmic}[1]
+    \State PVD([p(1)],0) = p1
+    \State PVD([p(1)],1) = (1-p1);
+
+    \For{i = 1 .. n}
+        \State bottom = max(0,k-(n-i));
+        \State up = min(i,k);
+        \For{j = bottom .. up}
+            \If{k=0}
+                \State PVD(C[p(1),..,p(i-1)],0)*(1-p(i));
+            \Else \If{k=n}
+                \State PVD(C[p(1),..,p(i-1)],j-1)*p(i);
+            \Else 
+                \State PVD(C[p(1),..,p(i-1)],j-1)*p(i) + PVD(C[p(1),..,p(i-1)],j)*(1-p(i));
+            \EndIf \EndIf
+        \EndFor
+    \EndFor
+\end{algorithmic}
+\ \\
 
 \pagebreak
 
@@ -130,6 +210,104 @@ Zložitosť závisí na počte MERGE operácii a veľkosti ich vstupu. Na každe
 
 \section*{Príklad 4}
 
+rekurzívny algoritmus
+
+\begin{algorithmic}[1]
+\Function{bestPrice}{lastIndexOfC,freePlaces[]}
+    \If{hasLastToFill(freePlaces)}
+        \State indexOf1 = index of number 1 in array
+	\State chosenItems is array of 0;
+	\State fill chosenItems with values of 0;
+	\State chosenItems[1] = indexOf1;
+	\State \Return (C[1][indexOf1],chosenItems);
+    \EndIf
+
+    \Comment{values is array of pair(number , chosenItems);}
+    \Comment{number: price}
+    \Comment{chosenItems is array for example [0,0,1,2]}
+
+    \For{i = 1 .. freePlaces.size} 		
+        \If{freePlaces[i] != 0}		
+            \State freePlacesCopy = freePlaces;			
+            \State	freePlacesCopy[i] = freePlacesCopy[i] - 1;			
+            \State	pref = bestPrice(lastIndexOfC - 1,freePlacesCopy[]);			
+            \State	values[i].number = pref.number + C[lastIndexOfC][i]; 
+	    \State	values[i].chosenItems[lastIndexOfC] = i;
+        \EndIf
+    \EndFor
+	
+    \State highestValueIndex = index of highest value in values[1].number .. values[values.size].number;
+    \State \Return values[highestValueIndex];
+\EndFunction
+
+\Function{hasLastToFill}{freePlaces[]}
+    \State \Return highest value in freePlaces is 1 and (freePlaces.size - 1) items in freePlaces is equal to 0
+\EndFunction
+\end{algorithmic}
+
+\subsection*{Technika dynamického programovania}
+
+Vytvorím štruktúru bestPrice, ktorá bude typu asociatívne pole
+kľúče budú typu Pair<Integer,Integer []>
+(lastIndexOfC,freePlaces [])
+prvá hodnota oznaèuje index riadku v poli C
+druhá hodnota bude typu pole, jeho dĺžka bude zodpovedať počtu autosalónov
+hodnota na indexe i bude zodpovedať počtu áut, ktoré je možné ešte predať do autosalónu s číslom $i$
+
+a = počet autosalónov
+
+hodnoty budú typu Pair<Integer,Integer []>
+(price,distribution [])
+prvá hodnota značí vypočítanú najlepšiu celkovú cenu
+druhá hodnota bude typu pole, jeho dåžka bude zodpovedať počtu riadkov v poli C,
+hodnoty v čom budú slúžiť na určenie toho, do ktorého salónu bude predané auto s indexom na ktorom je prvok umiestnený
+0 bude značiť, že auto zatiaľ nie je priradené do žiadneho salónu, 1 až a bude značiť konkrétny autosalón
+
+
+\begin{algorithmic}[1]
+\Function{countBestPrice}{C}
+    \For{i = 1 .. C.rows}		
+        \State combinations = nájdeme všetky kombinácie práve a císel z N0, ktoré sú menšie ako C.rows a, ktoré dávajú súčet i;
+        \Comment{každý prvok bude zoznam o dlžke a}				
+        \State permutations = []
+        
+	\For{combination in combinations}
+	    \State perm = všetky permutácie zoznamu combination
+	    \State permutations.addAll(perm);
+        \EndFor
+		
+        \For{permutation in permutations}		
+            \State items = [] of (price,distribution [])
+	    \If{hasLastToFill(freePlaces)}
+                \State indexOf1 = index of number 1 in array
+                \State chosenItems is array of 0;
+                \State fill chosenItems with values of 0;
+                \State chosenItems[1] = indexOf1;
+                \State \Return (C[1][indexOf1],chosenItems);
+            \EndIf
+            
+	    \For{ j = 1 .. permutation.size}
+                \State modifiedPermutation = copy of permutation
+		\If{modifiedPermutation[j]>0}
+		    \State modifiedPermutation[j] = modifiedPermutation[j] - 1;
+		    \State	item it;
+		    \State aPrice = bestPrice(i-1,modifiedPermutation);
+		    \State it.price = aPrice.price + C[i][j];
+		    \State it.distribution = aPrice.distribution;
+		    \State it.distribution[i] = j;
+                    \State items.add(it)
+                 \EndIf
+            \EndFor			
+		
+            \State highestValueIndex = index najvacsej hodnoty spomedzi items.price;
+            \State bestPrice[(i,permutation)] = items[highestValueIndex];		
+        \EndFor
+    \EndFor
+    \State \Return bestPrice with key(C.rows);
+\EndFunction
+\end{algorithmic}
+
+
 \pagebreak
 
 %----------------------------------------------------------------------------------------
@@ -137,5 +315,33 @@ Zložitosť závisí na počte MERGE operácii a veľkosti ich vstupu. Na každe
 %----------------------------------------------------------------------------------------
 
 \section*{Príklad 5}
+
+Hladový algoritmus nenájde správne riešenie pre druhý a tretí problém. \\
+Protipríklad: \\
+Dokument s dĺžkou riadku: 12 \\
+Zoznam slov obsahuje slová s dĺžkami 5,4,4,12 \\
+
+Algoritmus umiestni slová nasledovne: \\
+5,4 \\
+4 \\
+12 \\
+
+Druhý slovný problém: \\
+Celková penalizácia bude $3^2 + 8^2 + 0 = 9 + 64 = 73$ \\
+
+Optimálne riešenie je však: \\
+5 \\
+4,4 \\
+12 \\
+pri ktorom bude celková penalizácia $7^2 + 4^2 = 49 + 16 = 64$ \\
+
+Tretí slovný problém: \\
+Celková penalizácia bude: max(3,8,0) = 8 \\
+
+Optimálne riešenie je však: \\
+5 \\
+4,4 \\
+12 \\
+pri ktorom bude celková penalizácia max(7,4,0) = 7 \\
 
 \end{document}
