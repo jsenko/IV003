@@ -113,7 +113,28 @@ od
 
 
 
-
+findSpecialPermutations(sum,threshold) do
+	permutations = [] of [];
+	bottom1 = max(0,sum - 2*threshold);
+	upper1 = min(sum,threshold);
+	
+	for i = bottom1 .. upper1 do
+		permutation = [] of length 3
+		permutation[1] = i;
+		
+		bottom2 = max(0,sum - i - threshold);
+		upper2 = min(sum - i,threshold);
+		
+		for j=bottom2 .. upper2 do
+			permutation[2] = j;
+			permutation[3] = sum - (i+j);
+		od
+		
+		
+		permutations.add(permutation);
+	od	
+	return permutations;
+od
 
 
 
