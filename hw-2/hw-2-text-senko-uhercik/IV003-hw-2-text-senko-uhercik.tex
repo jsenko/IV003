@@ -114,15 +114,21 @@ Zložitosť závisí na počte MERGE operácii a veľkosti ich vstupu. Na každe
 
 \section*{Príklad 2}
 
-Pre riešenie tohto problému existuje jednoduchý rekurzívny algoritmus, jeho zložitosť je však exponenciálna z dôvodu opakovaného volania funkcie na rovnakých podproblémoch.
-Aby sme tomuto zabránili, využili sme závislosti medzi jednotlivými volaniami funkcie IS\_SENTENCE. Volania funkcie IS\_SENTENCE s konkrétnymi parametrami budeme ukladať do dátovej štruktúry typu asociatívne pole (hash tabulka). Vyhľadávanie v hash tabulke má konštantnú zložitosť, preto aj každé volanie funkcie IS\_SENTENCE s rovnakým parametrom bude mať konštantnú zložitosť. \\
+Algoritmus má nasledovný princíp:
+Pre každý vstupný reťazec urobí všetky možné rozdelenia tohto reťazca na 2 časti.
+Na prvú časť reťazca bude znova aplikovaná funkcia IS\_SENTENCE, kým na druhú časť bude aplikovaná funkcia DICT.
+Na výsledky volaní týchto funkcií aplikujeme operátor logický súčin a uložíme do poľa items.
+V prípade, že aspoň jeden prvok z poľa items obsahuje hodnotu true, pôvodný reťazec je možné rozdeliť na slová zo slovníka.
+Pre zefektívnenie algoritmu využijeme pri funkcii logical_and tzv. Short-circuit evaluation.
+
+
 
 \begin{algorithmic}[1]
     \Function{is\_sentence}{$w[1..n]$}
         \State items = [] of boolean
         \State items.add(DICT(w[1..n]));
         \For{i = 1 to n}
-        	\State item = IS\_SENTENCE(w[1 .. i]) logical\_and DICT(w[i + 1 .. n]);
+        	\State item = DICT(w[i + 1 .. n]) logical\_and IS\_SENTENCE(w[1 .. i]);
 		\State items.add(item);
         \EndFor
         \State \Return apply logical\_or on items;
@@ -130,26 +136,62 @@ Aby sme tomuto zabránili, využili sme závislosti medzi jednotlivými volaniam
 \end{algorithmic}
 \ \\
 
-asociatívne pole IS\_SENTENCE (Map<String,Boolean>)
-V nasledujúcom algoritme využívame techniku dynamického programovania.
-Štruktúra IS\_SENTENCE plní rovnakú funkciu ako metóda IS\_SENTENCE v predchádzajúcom príklade, rozdiel je však v tom, že každý prístup k nej bude mať konštantnú zložitosť \\
-\\
+Predstavme si nasledovný prípad
+Na vstup dostane algoritmus reťazec o dĺžke n.
+Pri overovaní jednotlivých rozdelení nájde slovo o dĺžke a (a zároveň sa rekurzívne zanorí na prefixe o dĺžke (n-a)) a ďalej pokračuje v overovaní ďalších rozdelení (s prefixami dĺžky (n-a+1),(n-a+2),...).
+
+Algoritmus sa rekurzívne zavolá na reťazci o dĺžke n-a.
+Pri týchto volaniach však overuje prefixy s dĺžkami 1 .. n-a. Tieto prefixy však overoval aj predošlý priechod algoritmu.
+
+Môžeme povedať, že volanie funkcie IS\_SENTENCE aplikované na reťazci dĺžky n je závislé na všetkých možných volaniach funkcie IS\_SENTENCE aplikovaných na prefixoch tohto reťazca.
+
+Z tohoto dôvodu je výhodné, ak vypočítame IS\_SENTENCE na prefixoch pôvodného reťazca a výsledky týchto volaní si uložíme do rovnomenného asociatívneho poľa.
+Kľúč tohto poľa bude tvorený prefixom pôvodného reťazca, hodnota bude typu boolean.
+
+
 \begin{algorithmic}[1]
-    \Function{is\_sentence}{$w[1..n]$}
+    \Function{VERIFY\_SENTENCE}{$w[1..n]$}
     	\For{i = 1 .. n}
     		\State subresults = [] of boolean;
-		\State subresults.add(DICT(w[1..i]));
-    		\For{j = 1 .. i - 1}
-    			\State subresult = IS\_SENTENCE(w[1 .. j]) logical\_and DICT(w[j + 1 .. i - i]);
-    			\State subresults.add(subresult);
-    		\EndFor
-    		\State \Return IS\_SENTENCE(w[1..i]) = apply logical\_or on subresults;
-	\EndFor
+			\State subresults.add(DICT(w[1..i]));
+				\For{j = 1 .. i - 1}
+					\State subresult = IS\_SENTENCE(w[1 .. j]) logical\_and DICT(w[j + 1 .. i - i]);
+					\State subresults.add(subresult);
+				\EndFor
+			\State \Return IS\_SENTENCE(w[1..i]) = apply logical\_or on subresults;
+		\EndFor
+		\State \Return IS\_SENTENCE(w[1..n]);
     \EndFunction
+	
 \end{algorithmic}
 \ \\
  
+Korektnosť: 
+
+Konvergencia:
+Jediné miesta, u ktorých hrozí, že algoritmus nezastaví, sú volania cyklov.
+V cykle s iterujúcou premennou i sa zaručene pri každom priechode zvýši hodnota premennej i a iterovanie skončí, keď premenná i dosiahne hodnotu n.
+V cykle s iterujúcou premennou j sa zaručene pri každom priechode zvýši hodnota premennej j a iterovanie skončí, keď premenná j dosiahne hodnotu i-1.
+
+Parciálna korektnosť:
+Dôkaz pomocou matematickej indukcie:
+1.) Algoritmus správne spočíta výsledok na reťazci o dĺžke jedného znaku a:
+	cyklus s iterujúcou premennou i sa vykoná práve raz
+	do poľa subresults vložíme práve jednu hodnotu - dict(a);
+	ak aplikujeme logický súčet na pole s jednou položkou, výsledok bude práve táto položka, teda hodnota dict(a)
+	
+2.) Predpokladáme, že algoritmus je korektný na reťazci o dĺžke k:
+	Pokúsime sa dokázať jeho korektnosť na reťazci o dĺžke k+1.
+
+
+
+ 
 Zložitosť:
+Cyklus s iterujúcou premennou i bude vykonaný n krát.
+
+Vnorený cyklus s iterujúcou premennou j bude vykonaný (i-1) krát, a plaží, že (i-1) < n. Všetky operácie použité v ňom majú konštantnú zložitosť.
+Volanie apply logical\_or on subresults bude mať rovnakú zložitosť ako vnorený cyklus (vzhľadom k tomu, že počet jeho položiek zodpovedá počtu iterácií).
+
 $\mathcal{O}(n^2)$
 
 \pagebreak
@@ -160,11 +202,23 @@ $\mathcal{O}(n^2)$
 
 \section*{Príklad 3}
 
+Vstupom algoritmu bude:
 pole pravdepodobností: $C[p(1),..,p(n)]$\\
-$k$ - počet hláv\\
+$k$ - počet padnutých orlov\\
 PVD - pravdepodobnostná funkcia\\
 
-jednoduchý rekurzívny algoritmus: \\
+Problém je možné definovať nasledovne: 
+vypočíť pravdepodobnosť, že v poli padne k orlov z n mincí
+
+táto pravdepodobnosť je ekvivaletná súčtu pravdepodobností nasledovných prípadov:
+
+1.) pravdepodobnosť prípadu, že posledná minca bude orol
+táto pravdepodobnosť je ekvivalentná súčinu čísla p(n) a pravdepodobnosti, že medzi prvými n-1 mincami bude k-1 orlov
+
+2.) pravdepodobnosť prípadu, že posledná minca nebude orol
+táto pravdepodobnosť je ekvivalentná súčinu čísla (1-p(n)) a pravdepodobnosti, že medzi prvými n-1 mincami bude k orlov
+
+Tento poznatok nám umožňuje definovať jednoduchý rekurzívny algoritmus (v ktorm zároveň ošetrujeme krajné prípady n=k a n=0)
 
 \begin{algorithmic}[1]
     \Function{PVD}{C[p1,..,pn],k}
@@ -179,28 +233,52 @@ jednoduchý rekurzívny algoritmus: \\
 \end{algorithmic}
 \ \\
 
-technika dynamického programovania
-vytvorím asociatívne pole typu Map<Pair<Float[],Integer>,Integer> s názvom PVD\\
+Ak rozpíšeme vetvenie algoritmu vykonávanie bude vyzerať približne nasledovne
+PVD(C[p(1),..,p(n)],k) = PVD(C[p(1),..,p(n-1)],k-1)*p(n) + PVD(C[p(1),..,p(n-1)],k)*(1-p(n))
+
+PVD(C[p(1),..,p(n-1)],k) = PVD(C[p(1),..,p(n-1)],k-1)*p(n-1) + PVD(C[p(1),..,p(n-1)],k)*(1-p(n-1))
+
+PVD(C[p(1),..,p(n-1)],k-1) = PVD(C[p(1),..,p(n-1)],k-2)*p(n-1) + PVD(C[p(1),..,p(n-1)],k-1)*(1-p(n-1))
+
+...
+Z predchádzajúceho zápisu volaní funkcií je možné vidieť, že PVD(C[p(1),..,p(n-1)],k-1) sa zavolá 2 krát na jednej úrovni rekurzívneho stromu.
+Využijeme techniku dynamického programovania, aby sme sa vyhli opakovanému volaniu funkcie PVD na rovnakých parametroch.
+Z algoritmu je zreteľné, že volanie funkcie PVD, ktorá berie ako parameter pole o dĺžke a, je závislá výlučne na volaniach funkcií PVD, ktoré berú ako parameter pole o dĺžke a-1.
+Z tohoto dôvodu je výhodné, ak vypočítame najprv. funkcie s parametrami PVD(C[p(1)],0), PVD(C[p(1)],1), PVD(C[p(1),p(2)],0),... ,ich výsledky si budem ukladať do asociatívneho poľa a postupným volaním sa dopracujem k hodnote PVD(C[p(1),..,p(n)],k), ktorá je výsledkom celého problému.
+Pre tento účel vytvoríme asociatívne pole s názvom PVD, v ktorom kľúče budú mať tvar:
+(C[p(1),..,p(n)],k)
+a hodnoty budú obsahovať napočítanú pravdepodobnosť.
+Na naplnenie tohto poľa vytvoríme jednoduchú nerekurzívnu funkciu:
+
 
 \begin{algorithmic}[1]
-    \State PVD([p(1)],0) = p1
-    \State PVD([p(1)],1) = (1-p1);
+	\Function{countPVD}{C[p1,..,pn],k}
+		\State PVD([p(1)],0) = p1
+		\State PVD([p(1)],1) = (1-p1);
 
-    \For{i = 1 .. n}
-        \State bottom = max(0,k-(n-i));
-        \State up = min(i,k);
-        \For{j = bottom .. up}
-            \If{k=0}
-                \State PVD(C[p(1),..,p(i-1)],0)*(1-p(i));
-            \Else \If{k=n}
-                \State PVD(C[p(1),..,p(i-1)],j-1)*p(i);
-            \Else 
-                \State PVD(C[p(1),..,p(i-1)],j-1)*p(i) + PVD(C[p(1),..,p(i-1)],j)*(1-p(i));
-            \EndIf \EndIf
-        \EndFor
-    \EndFor
+		\For{i = 1 .. n}
+			\State bottom = max(0,k-(n-i));
+			\State up = min(i,k);
+			\For{j = bottom .. up}
+				\If{k=0}
+					\State PVD(C[p(1),..,p(i-1)],0)*(1-p(i));
+				\Else \If{k=n}
+					\State PVD(C[p(1),..,p(i-1)],j-1)*p(i);
+				\Else 
+					\State PVD(C[p(1),..,p(i-1)],j-1)*p(i) + PVD(C[p(1),..,p(i-1)],j)*(1-p(i));
+				\EndIf \EndIf
+			\EndFor
+		\EndFor
+		\State \Return PVD(C[p(1),..,p(n-1)],k);
+	\EndFunction
 \end{algorithmic}
 \ \\
+Zložitosť:
+Cyklus s iterujúcou premennou i sa vykoná n krát.
+V ňom sa vnorený cyklus iterujúcou premennou j vykoná vždy (up - bottom) krát.
+V každom cykle bude hodnota premennej bottom minimálne 0 a hodnota premennej up maximálne k, z čoho vyplýva, že počet týchto cyklov bude maximálne k.
+Je zaručené, že k < n a teda zložitosť celého algoritmu bude patriť do triedy $\mathcal{O}(n^2)$
+
 
 \pagebreak
 
@@ -306,6 +384,13 @@ hodnoty v čom budú slúžiť na určenie toho, do ktorého salónu bude predan
     \State \Return bestPrice with key(C.rows);
 \EndFunction
 \end{algorithmic}
+
+Konvergencia
+
+
+
+Parciálna korektnosť
+
 
 
 \pagebreak
