@@ -114,12 +114,11 @@ Zložitosť závisí na počte MERGE operácii a veľkosti ich vstupu. Na každe
 
 \section*{Príklad 2}
 
-Algoritmus má nasledovný princíp:
-Pre každý vstupný reťazec urobí všetky možné rozdelenia tohto reťazca na 2 časti.
+Pre každý vstupný reťazec urobí algoritmus všetky možné rozdelenia tohto reťazca na 2 časti.
 Na prvú časť reťazca bude znova aplikovaná funkcia IS\_SENTENCE, kým na druhú časť bude aplikovaná funkcia DICT.
 Na výsledky volaní týchto funkcií aplikujeme operátor logický súčin a uložíme do poľa items.
 V prípade, že aspoň jeden prvok z poľa items obsahuje hodnotu true, pôvodný reťazec je možné rozdeliť na slová zo slovníka.
-Pre zefektívnenie algoritmu využijeme pri funkcii logical_and tzv. Short-circuit evaluation.
+Pre zefektívnenie algoritmu využijeme pri funkcii logical\_and tzv. Short-circuit evaluation.
 
 
 
@@ -169,19 +168,34 @@ Kľúč tohto poľa bude tvorený prefixom pôvodného reťazca, hodnota bude ty
 Korektnosť: 
 
 Konvergencia:
+Prvy cyklus sa vykoná pre každý prefix slova w.
+V cykle sa hodnota premennej i reprezentujucej dlžku prefixu pri každom priechode zvýši o 1 a iterovanie skončí, keď premenná i dosiahne hodnotu n.
+
+Vnorený cyklus sa vykoná pre každý prefix tohto prefixu. 
+
 Jediné miesta, u ktorých hrozí, že algoritmus nezastaví, sú volania cyklov.
-V cykle s iterujúcou premennou i sa zaručene pri každom priechode zvýši hodnota premennej i a iterovanie skončí, keď premenná i dosiahne hodnotu n.
+
 V cykle s iterujúcou premennou j sa zaručene pri každom priechode zvýši hodnota premennej j a iterovanie skončí, keď premenná j dosiahne hodnotu i-1.
 
 Parciálna korektnosť:
-Dôkaz pomocou matematickej indukcie:
-1.) Algoritmus správne spočíta výsledok na reťazci o dĺžke jedného znaku a:
-	cyklus s iterujúcou premennou i sa vykoná práve raz
-	do poľa subresults vložíme práve jednu hodnotu - dict(a);
-	ak aplikujeme logický súčet na pole s jednou položkou, výsledok bude práve táto položka, teda hodnota dict(a)
+Dôkaz, že algoritmus vráti true pri validnej postupnosti slov pomocou matematickej indukcie:
+1.) S0 = w0 je veta ktorá sa skladá z jedného slova w0 (w0 sa nachádza v slovníku). Pre takúto vetu vráti algoritmus true. Dôvod: položky subresults pre prvok IS\_SENTENCE(w0) budú obsahovať položku dict(w0), ktorá sa vyhodnotí na true. Na položky je aplikovaná funkcia logiký súčet a pretože obsahujú minimálne jednu položku z hodnotou true, algoritmus vráti true.
 	
-2.) Predpokladáme, že algoritmus je korektný na reťazci o dĺžke k:
-	Pokúsime sa dokázať jeho korektnosť na reťazci o dĺžke k+1.
+2.) Predpokladáme, že pre vetu s1 zloženú z k slov: s1 = w1.w2...wk vráti korektnú odpoveď true.
+	Predpokldáme, že pre vetu s2 zloženú s2 = s1.w(k +1) algoritmus taktiež vráti true.
+	Jeden z prefixov vety s2 musí byť reťazec zložený zo slov w1...wk.
+	Keďže algoritmus prechádza všetky prefixy, nastane situácia, jedna z položiek v poli subresults
+	pre prvok s2 bude IS\_SENTENCE(s1) logical_and dict(w(k+1)).
+	
+	
+Dôkaz, že algoritmus vráti true pri nevalidnej postupnosti slov
+
+	
+	
+	
+	
+	
+	
 
 
 
@@ -291,41 +305,28 @@ Je zaručené, že k < n a teda zložitosť celého algoritmu bude patriť do tr
 rekurzívny algoritmus
 
 \begin{algorithmic}[1]
-\Function{bestPrice}{lastIndexOfC,freePlaces[]}
-    \If{hasLastToFill(freePlaces)}
-        \State indexOf1 = index of number 1 in array
-	\State chosenItems is array of 0;
-	\State fill chosenItems with values of 0;
-	\State chosenItems[1] = indexOf1;
-	\State \Return (C[1][indexOf1],chosenItems);
+\Function{best\_price}{n,freePlaces[]}
+    \If{n == 0}
+        \State \Return 0
     \EndIf
 
-    \Comment{values is array of pair(number , chosenItems);}
-    \Comment{number: price}
-    \Comment{chosenItems is array for example [0,0,1,2]}
+    \State values = [] of number
 
     \For{i = 1 .. freePlaces.size} 		
         \If{freePlaces[i] != 0}		
-            \State freePlacesCopy = freePlaces;			
+            \State freePlacesCopy = copy of freePlaces;			
             \State	freePlacesCopy[i] = freePlacesCopy[i] - 1;			
-            \State	pref = bestPrice(lastIndexOfC - 1,freePlacesCopy[]);			
-            \State	values[i].number = pref.number + C[lastIndexOfC][i]; 
-	    \State	values[i].chosenItems[lastIndexOfC] = i;
+            \State values[i] = best\_price(n-1,freePlacesCopy) + C[n][i];
         \EndIf
     \EndFor
-	
-    \State highestValueIndex = index of highest value in values[1].number .. values[values.size].number;
-    \State \Return values[highestValueIndex];
-\EndFunction
 
-\Function{hasLastToFill}{freePlaces[]}
-    \State \Return highest value in freePlaces is 1 and (freePlaces.size - 1) items in freePlaces is equal to 0
+    \State \Return max(values);
 \EndFunction
 \end{algorithmic}
 
 \subsection*{Technika dynamického programovania}
 
-Vytvorím štruktúru bestPrice, ktorá bude typu asociatívne pole
+Vytvorím štruktúru bestPriceData, ktorá bude typu asociatívne pole
 kľúče budú typu Pair<Integer,Integer []>
 (lastIndexOfC,freePlaces [])
 prvá hodnota oznaèuje index riadku v poli C
@@ -340,6 +341,64 @@ prvá hodnota značí vypočítanú najlepšiu celkovú cenu
 druhá hodnota bude typu pole, jeho dåžka bude zodpovedať počtu riadkov v poli C,
 hodnoty v čom budú slúžiť na určenie toho, do ktorého salónu bude predané auto s indexom na ktorom je prvok umiestnený
 0 bude značiť, že auto zatiaľ nie je priradené do žiadneho salónu, 1 až a bude značiť konkrétny autosalón
+
+
+
+
+// sum = numberOfCars
+// threshold = carsPerShop
+Vypocita vsetky rozdelenia daneho poctu aut k autosalonom pre 1 to bude [100] [010] [001]
+findSpecialPermutations(sum,threshold) do
+	if(sum = 0) return [0,0,0]
+	permutations = [] of [];
+	bottom1 = max(0,sum - 2*threshold);
+	upper1 = min(sum,threshold);
+	
+	for i = bottom1 .. upper1 do
+		permutation = [] of length 3
+		permutation[1] = i;
+		
+		bottom2 = max(0,sum - i - threshold);
+		upper2 = min(sum - i,threshold);
+		
+		for j=bottom2 .. upper2 do
+			permutation[2] = j;
+			permutation[3] = sum - (i+j);
+		od
+		
+		
+		permutations.add(permutation);
+	od	
+	return permutations;
+od
+
+
+
+
+\begin{algorithmic}[1]
+\Function{countBestPrice}{C}
+	bestPriceData(0,[0,0,0]) = 0;
+    \For{i = 1 .. C.rows}				
+        \State permutations = findSpecialPermutations(i,C.rows/3);
+		
+	items = [] of number;
+		
+        \For{permutation in permutations}		
+            
+	    \For{ j = 1 .. permutation.size}
+                \State modifiedPermutation = copy of permutation
+		\If{modifiedPermutation[j]>0}
+		    \State modifiedPermutation[j] = modifiedPermutation[j] - 1;
+		    items.add(bestPrice(i-1,modifiedPermutation) + C[i][j]);
+                 \EndIf
+            \EndFor			
+		
+            \State bestPrice[(i,permutation)] = max(items);		
+        \EndFor
+    \EndFor
+    \State \Return bestPrice with key(C.rows);
+\EndFunction
+\end{algorithmic}
 
 
 \begin{algorithmic}[1]
