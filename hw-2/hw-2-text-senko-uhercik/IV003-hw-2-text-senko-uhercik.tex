@@ -114,26 +114,28 @@ Zložitosť závisí na počte MERGE operácii a veľkosti ich vstupu. Na každe
 
 \section*{Príklad 2}
 
-Pre každý vstupný reťazec urobí algoritmus všetky možné rozdelenia tohto reťazca na 2 časti.
-Na prvú časť reťazca bude znova aplikovaná funkcia IS\_SENTENCE, kým na druhú časť bude aplikovaná funkcia DICT.
-Na výsledky volaní týchto funkcií aplikujeme operátor logický súčin a uložíme do poľa items.
-V prípade, že aspoň jeden prvok z poľa items obsahuje hodnotu true, pôvodný reťazec je možné rozdeliť na slová zo slovníka.
-Pre zefektívnenie algoritmu využijeme pri funkcii logical\_and tzv. Short-circuit evaluation.
-
-
+Algoritmus vykoná všetky možné rozdelenia vstupného reťazca na 2 časti, prefix a suffix.
+Ak je daný reťazec veta, existuje aspoň jedno rozdelenie také, že suffix je slovo a prefix je znovu veta.
+Tento test sa vykoná v tele cyklu, kde sa rekurzívne použije IS\_SENTENCE na danom prefixe vstupného slova.
+Premenná $result$ je true práve vtedy ak je aspoň jeden z týchto testov je true.
 
 \begin{algorithmic}[1]
-    \Function{is\_sentence}{$w[1..n]$}
-        \State items = [] of boolean
-        \State items.add(DICT(w[1..n]));
-        \For{i = 1 to n}
-        	\State item = DICT(w[i + 1 .. n]) logical\_and IS\_SENTENCE(w[1 .. i]);
-		\State items.add(item);
+    \Function{is\_sentence}{$w[1 \dots n]$}
+        \State result = IN\_DICTIONARY($w[1 \dots n$]);
+        \For{$i = 1 \dots n$}
+        	\State item = IS\_SENTENCE($w[1 \dots i]$) $\wedge$ IN\_DICTIONARY($w[i + 1 \dots n]$);
+		\State result = result $\vee$ item;
         \EndFor
-        \State \Return apply logical\_or on items;
+        \State \Return result;
     \EndFunction
 \end{algorithmic}
 \ \\
+
+Pri každom z rekurzívnych volaní je argument funkcie IS\_SENTENCE {\em vždy prefixom} argumentu volajúcej funkcie.
+Pri tomto rekurzívnom algoritme môže existovať v strome rekurzie viacero ciest k volaniu IS\_SENTENCE s rovnakým argumentom, avšak každý reťazec má konečné množstvo prefixov, konkrétne $n - 1$.
+Preto stačí vykonať iba lineárne množstvo volaní.
+Tieto volania sa dajú {\em usporiadať} tak, že sa funkcia postupné volá pre rastúci prefix. 
+Táto myšlienka je základom nasledujúcej dynamickej varianty funckie IS\_SENTENCE.\\
 
 Predstavme si nasledovný prípad
 Na vstup dostane algoritmus reťazec o dĺžke n.
@@ -149,19 +151,16 @@ Kľúč tohto poľa bude tvorený prefixom pôvodného reťazca, hodnota bude ty
 
 
 \begin{algorithmic}[1]
-    \Function{VERIFY\_SENTENCE}{$w[1..n]$}
-    	\For{i = 1 .. n}
-    		\State subresults = [] of boolean;
-			\State subresults.add(DICT(w[1..i]));
-				\For{j = 1 .. i - 1}
-					\State subresult = IS\_SENTENCE(w[1 .. j]) logical\_and DICT(w[j + 1 .. i - i]);
-					\State subresults.add(subresult);
-				\EndFor
-			\State \Return IS\_SENTENCE(w[1..i]) = apply logical\_or on subresults;
-		\EndFor
-		\State \Return IS\_SENTENCE(w[1..n]);
-    \EndFunction
-	
+    \Function{is\_sentence}{$w[1 \dots n]$}
+    \For{$i = 1 \dots n$}
+        \State result = IN\_DICTIONARY($w[1 \dots i]$);
+        \For{$j = 1 \dots i - 1$}
+                \State item = SENTENCE\_DATA($w[1 \dots j]$) $\wedge$ IN\_DICTIONARY($w[j + 1 \dots i - 1]$);
+		\State result = result $\vee$ item;
+        \EndFor
+	\EndFor
+	\State \Return result;
+    \EndFunction	
 \end{algorithmic}
 \ \\
  
@@ -185,7 +184,7 @@ Dôkaz, že algoritmus vráti true pri validnej postupnosti slov pomocou matemat
 	Predpokldáme, že pre vetu s2 zloženú s2 = s1.w(k +1) algoritmus taktiež vráti true.
 	Jeden z prefixov vety s2 musí byť reťazec zložený zo slov w1...wk.
 	Keďže algoritmus prechádza všetky prefixy, nastane situácia, jedna z položiek v poli subresults
-	pre prvok s2 bude IS\_SENTENCE(s1) logical_and dict(w(k+1)).
+	pre prvok s2 bude IS\_SENTENCE(s1) logical\_and dict(w(k+1)).
 	
 	
 Dôkaz, že algoritmus vráti true pri nevalidnej postupnosti slov
@@ -220,7 +219,7 @@ Vstupom algoritmu bude:
 pole pravdepodobností: $C[p(1),..,p(n)]$\\
 $k$ - počet padnutých orlov\\
 PVD - pravdepodobnostná funkcia\\
-
+n
 Problém je možné definovať nasledovne: 
 vypočíť pravdepodobnosť, že v poli padne k orlov z n mincí
 
@@ -304,6 +303,14 @@ Je zaručené, že k < n a teda zložitosť celého algoritmu bude patriť do tr
 
 rekurzívny algoritmus
 
+Cenu optimálneho rozdelenie áut do autosalónov je možné vypočítať pomocou jednoduchécho rekurzívneho algoritmu.
+Číslo auta je zároveň jeho index riadku v matici cien.
+Parameter n v algoritme bestPrice udáva počet áut ktoré ešte neboli priradené do autosalónu a kedže sa autá priradujú postupne, tak udáva zároveň aj číslo nasleujúceho nepriradeného auta.
+Parameter freePlaces udáva počet neobsadených miest v jednotlivých autosalónoch (číslo na indexe i v tomto poli udáva počet volných miest v autosalóne i).
+V každom rekurzívnom volaní priradíme auto do každého autosalónu az týchto priradení vrátime maximálnu cenu.
+Rekurzia sa zastaví v prípade že sme priradili už všetky autá.
+Predpokladáme že počet áut je delitelný počtom autsalónov.
+
 \begin{algorithmic}[1]
 \Function{best\_price}{n,freePlaces[]}
     \If{n == 0}
@@ -326,131 +333,160 @@ rekurzívny algoritmus
 
 \subsection*{Technika dynamického programovania}
 
-Vytvorím štruktúru bestPriceData, ktorá bude typu asociatívne pole
-kľúče budú typu Pair<Integer,Integer []>
-(lastIndexOfC,freePlaces [])
-prvá hodnota oznaèuje index riadku v poli C
-druhá hodnota bude typu pole, jeho dĺžka bude zodpovedať počtu autosalónov
-hodnota na indexe i bude zodpovedať počtu áut, ktoré je možné ešte predať do autosalónu s číslom $i$
+Každé volanie funkcie bestPrice na matici s počtom riadkov k potrebuje  výsledky volaní funkcie betPrice na matici s počtom riadkov k-1. Toto nám jasne definuje závislosť  a teda možné usporiadanie volaní.
 
-a = počet autosalónov
+Vytvorím štruktúru bestPriceData, ktorá  bude mať typ asociatívneho poľa asociatívnych polí.
 
-hodnoty budú typu Pair<Integer,Integer []>
-(price,distribution [])
-prvá hodnota značí vypočítanú najlepšiu celkovú cenu
-druhá hodnota bude typu pole, jeho dåžka bude zodpovedať počtu riadkov v poli C,
-hodnoty v čom budú slúžiť na určenie toho, do ktorého salónu bude predané auto s indexom na ktorom je prvok umiestnený
-0 bude značiť, že auto zatiaľ nie je priradené do žiadneho salónu, 1 až a bude značiť konkrétny autosalón
+
+Vonkašie asociatívne pole (BestPriceData)
+kľúč index riadku v matici C
+hodnota bude pole dvojíc PricesForFreePlaces
+
+Štruktúra PricesForFreePlaces takisto asociatívne pole
+kľúč bude typu freePlaces (pole čísel)
+hodnota bude typu price, číslo
 
 
 
+Aby sme zaznamenali všetky možné kombinácie parametrov n a freePlaces, vo funkcii bestPrice sme vytvorili funkciu findSpecialPermutations. Táto funkcia vráti všetky možnosti ako môže vyzeraž pole freePlaces pre sum áut v prípade že do jedného autosalónu môžeme daž maximálne threshold áut.
 
-// sum = numberOfCars
-// threshold = carsPerShop
-Vypocita vsetky rozdelenia daneho poctu aut k autosalonom pre 1 to bude [100] [010] [001]
-findSpecialPermutations(sum,threshold) do
-	if(sum = 0) return [0,0,0]
-	permutations = [] of [];
-	bottom1 = max(0,sum - 2*threshold);
-	upper1 = min(sum,threshold);
+\begin{algorithmic}
+\Function{findSpecialPermutations}{sum,threshold} 
+	\If{sum = 0}
+		\State \Return [0,0,0]
+	\EndIf
+	\State permutations = [] of [];
+	\State bottom1 = max(0,sum - 2*threshold);
+	\State upper1 = min(sum,threshold);
 	
-	for i = bottom1 .. upper1 do
-		permutation = [] of length 3
-		permutation[1] = i;
+	\For{ i = bottom1 .. upper1 }
+		\State permutation = [] of length 3
+		\State permutation[1] = i;
 		
-		bottom2 = max(0,sum - i - threshold);
-		upper2 = min(sum - i,threshold);
+		\State bottom2 = max(0,sum - i - threshold);
+		\State upper2 = min(sum - i,threshold);
 		
-		for j=bottom2 .. upper2 do
-			permutation[2] = j;
-			permutation[3] = sum - (i+j);
-		od
+		\For{j=bottom2 .. upper2}
+			\State permutation[2] = j;
+			\State permutation[3] = sum - (i+j);
+		\EndFor
 		
 		
 		permutations.add(permutation);
-	od	
-	return permutations;
-od
-
-
-
-
-\begin{algorithmic}[1]
-\Function{countBestPrice}{C}
-	bestPriceData(0,[0,0,0]) = 0;
-    \For{i = 1 .. C.rows}				
-        \State permutations = findSpecialPermutations(i,C.rows/3);
-		
-	items = [] of number;
-		
-        \For{permutation in permutations}		
-            
-	    \For{ j = 1 .. permutation.size}
-                \State modifiedPermutation = copy of permutation
-		\If{modifiedPermutation[j]>0}
-		    \State modifiedPermutation[j] = modifiedPermutation[j] - 1;
-		    items.add(bestPrice(i-1,modifiedPermutation) + C[i][j]);
-                 \EndIf
-            \EndFor			
-		
-            \State bestPrice[(i,permutation)] = max(items);		
-        \EndFor
-    \EndFor
-    \State \Return bestPrice with key(C.rows);
+	\EndFor
+	\State \Return permutations;
 \EndFunction
 \end{algorithmic}
 
+\ \\
+
+Nasledovná nerekurzívna funkcia postupne priradí do štruktúry bestPriceData hodnoty najlepších možných cien pre danú konfiguráciu.
+Vonkajší for cyklus s iterujúcou premennou i v každom priechode spocita maximalne ceny pre vsešetky distribucie pr i aut.
+Využívame hodnoty v bestPriceData vypočítané v predchádzajúcih priechodoch cyklom.
+
 
 \begin{algorithmic}[1]
 \Function{countBestPrice}{C}
-    \For{i = 1 .. C.rows}		
-        \State combinations = nájdeme všetky kombinácie práve a císel z N0, ktoré sú menšie ako C.rows a, ktoré dávajú súčet i;
-        \Comment{každý prvok bude zoznam o dlžke a}				
-        \State permutations = []
-        
-	\For{combination in combinations}
-	    \State perm = všetky permutácie zoznamu combination
-	    \State permutations.addAll(perm);
-        \EndFor
+    \State bestPriceData[ (0, [0,0,0]) ] = 0;
+    \For{i = 1 .. C.rows}				
+        \State permutations = findSpecialPermutations(i,C.rows/3);
+	
 		
         \For{permutation in permutations}		
-            \State items = [] of (price,distribution [])
-	    \If{hasLastToFill(freePlaces)}
-                \State indexOf1 = index of number 1 in array
-                \State chosenItems is array of 0;
-                \State fill chosenItems with values of 0;
-                \State chosenItems[1] = indexOf1;
-                \State \Return (C[1][indexOf1],chosenItems);
-            \EndIf
+            
+            \State items = [] of number;
+            
+	    \For{ j = 1 .. permutation.size}
+	    	
+                \State modifiedPermutation = copy of permutation
+		\If{modifiedPermutation[j]>0}
+		    \State modifiedPermutation[j] = modifiedPermutation[j] - 1;
+		    \State items.add(bestPriceData[(i-1,modifiedPermutation)] + C[i][j]);
+                 \EndIf
+            \EndFor			
+		
+            \State bestPriceData[(i,permutation)] = max(items);		
+        \EndFor
+    \EndFor
+    \State \Return bestPriceData[C.rows,[C.rows/3,C.rows/3,C.rows/3]];
+\EndFunction
+\end{algorithmic}
+
+Konvergencia
+Algoritmus môže nekonvergovať len pri vyhodnotení podmienky jedného z troch cyklov.
+Cyklus s iterujúcou premennou j sa skončí pretože permutation.size je kladná konštanta.
+Cyklus s iterujúcou premennou permutation skončí pretože funkcia findSpecialPermutations vráti konečný počet položiek.
+Vonkajší cyklus pretože C.rows je kladná konštanta.
+
+
+Parciálna korektnosť
+Dokážeme matematickou indukciou podla počtu áut pre ktorý sme už vypočítali maximalnu cenu (vonkajší cyklus).
+
+Bázovy krok
+Pre i = 0
+Táto situácia je riešená pred cyklom naplnením pola bestPriceData hodnotou (0, [0,0,0]).
+
+Indukčný krok:
+Pre i = k
+Predpokladáme že bestPriceData obsahuje správne vypočítané maximálne ceny pre všetky možné konfigurácie freePlaces pre počet áut k , označme ich currentFreePlaces.
+Vnútorný for cyklus s iterujúcou premennou permutation vypočíta maximálne ceny pre všetky možné konfigurácie freePlaces. Každá maximálna cena sa vypočíta ako maximum z už vypočítaných konfigurácii.
+Pretože for cyklus prebehne pre všetky možné permutácie pre k áut, budú dostupné pre k+1 iteráciu cyklu.
+
+Pre krátkost tento algoritmus počíta len výšku najlepšej ceny za akú je možné autá predať, ale je triviálne modfikovatelný aby si spolu s cenou pametal aj konkretne priradenie aut do autosalonov.
+Namiesto ceny je stačí uložiť do bestPriceData dvojicu (cena, priradenie). Priradenie je pole o dlžke C.rows a hodnota na indexe i v tomto poli vyjadruje číslo autosalónu do ktorého bude auto priradené, prípadne 0 ak eťe nie je priradené.
+
+Nasledujúci algoritmus toto implementuje:
+
+Zložitosť
+funkcia findSpecialPermutations
+vo funkcii sa nachádzajú dva cykly:
+počet vykonaní prvého cyklu je (upper1 - bottom1), rozdiel týchto premenných bude vždy menší ako počet áut.
+Ekvivalentné tvrdenie môžeme spraviť pre druhý cyklus s počtom vykonaní (upper1 - bottom1).
+Každá operácia použitá v cykloch má konštantnú zložitosť, preto je jej celková zložitosť $\mathcal{O}(n^2)$.
+
+funkcia countBestPrice
+vonkajší cyklus sa vykoná pre každé auto práve raz, teda C.row krát.
+
+Zo zložistosti funkcie findSpecialPermutations môžeme povedať, že počet prvkov v poli permutations je maximálne kvadraticky závislý na premennej i.
+
+Zložitosť operácií v cykle s iterujúcou premennou j je konštatný, vzhľadom na to, že hodnota permutation.size zodpovedá počtu autosalónov a ten je konštantný počas celého vykonávania programu.
+Zložitosť cyklu s iterujúcou premennou permutation má preto zložitosť $\mathcal{O}(n^2)$ (kvôli počtu prvkov v poli permutations).
+
+Predošlé tvrdenia môžeme zredukovať na tvrdenie, že v cykle s iterujúcou premennou i sa vždy vykonajú dve operácie so zložitosťou $\mathcal{O}(n^2)$.
+Jeho zložitosť je teda $\mathcal{O}(n^3)$.
+
+
+\begin{algorithmic}[1]
+\Function{countBestPrice}{C}
+    bestPriceData[(0,[0,0,0])] = 0;
+    \For{i = 1 .. C.rows}		
+        \State permutations = findSpecialPermutations(i,C.rows/3);
+				
+        \For{permutation in permutations}		
+            \State items = [] of item (price -> number, distribution -> [] of number); 
             
 	    \For{ j = 1 .. permutation.size}
                 \State modifiedPermutation = copy of permutation
 		\If{modifiedPermutation[j]>0}
 		    \State modifiedPermutation[j] = modifiedPermutation[j] - 1;
 		    \State	item it;
-		    \State aPrice = bestPrice(i-1,modifiedPermutation);
+		    \State aPrice = bestPriceData[(i-1,modifiedPermutation)];
 		    \State it.price = aPrice.price + C[i][j];
 		    \State it.distribution = aPrice.distribution;
 		    \State it.distribution[i] = j;
-                    \State items.add(it)
+                    \State items.add(it);
                  \EndIf
             \EndFor			
 		
-            \State highestValueIndex = index najvacsej hodnoty spomedzi items.price;
-            \State bestPrice[(i,permutation)] = items[highestValueIndex];		
+            \State highestPriceIndex = index into items for item with highest price;
+            \State bestPriceData[(i,permutation)] = items[highestPriceIndex];		
         \EndFor
     \EndFor
-    \State \Return bestPrice with key(C.rows);
+     \State \Return bestPriceData[C.rows,[C.rows/3,C.rows/3,C.rows/3]];
 \EndFunction
 \end{algorithmic}
 
-Konvergencia
-
-
-
-Parciálna korektnosť
-
-
+Algoritmus je rozšíriteľný pre väčší počet autosalónov, je však potrebné zmeniť implementáciu funkcie findSpecialPermutations.
 
 \pagebreak
 
