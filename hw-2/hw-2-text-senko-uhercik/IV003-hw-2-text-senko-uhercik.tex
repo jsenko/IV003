@@ -68,13 +68,14 @@
 
 \begin{document}
 
-\maketitle % Print the title
+%\maketitle  Print the title
 
 %----------------------------------------------------------------------------------------
 %	Príklad 1
 %----------------------------------------------------------------------------------------
 
-\section*{Príklad 1}
+\section*{IV003 2014, Sada 2, Príklad 1}
+\subsection*{Jakub Senko (373902), Štefan Uherčík (374375)}
 
 Zaveďme všeobecnú reprezentáciu budov. Každá uvažovaná budova sa dá reprezentovať ako množina dvojíc $(x_k, h_k)$, určujúcich výšku budovy $h$ na súradnici $x$. Zápis sa dá zjednodušiť usporiadaním bodov vzostupne podľa $x$. Stačí uvažovať len tie dvojice, ktoré označujú miesto, v ktorom nastáva zmena výšky budovy. Tento zápis je ekvivalentný so zápisom použitým v zadaní
 
@@ -112,18 +113,23 @@ Zložitosť závisí na počte MERGE operácii a veľkosti ich vstupu. Na každe
 %	Príklad 2
 %----------------------------------------------------------------------------------------
 
-\section*{Príklad 2}
+\section*{IV003 2014, Sada 2, Príklad 2}
+\subsection*{Jakub Senko (373902), Štefan Uherčík (374375)}
 
-Algoritmus vykoná všetky možné rozdelenia vstupného reťazca na 2 časti, prefix a suffix.
+Slovník pojmov: \ \\
+slovo - reťazec, pre ktorý vráti funkcia dict true \ \\
+veta - postupnosť zreťazených slov, medzi jednotlivými slovami sa nenachádzajú žiadne iné znaky \ \\
+
+Algoritmus overí všetky možné rozdelenia vstupného reťazca na 2 časti, prefix a suffix.
 Ak je daný reťazec veta, existuje aspoň jedno rozdelenie také, že suffix je slovo a prefix je znovu veta.
 Tento test sa vykoná v tele cyklu, kde sa rekurzívne použije IS\_SENTENCE na danom prefixe vstupného slova.
-Premenná $result$ je true práve vtedy ak je aspoň jeden z týchto testov je true.
+Premenná $result$ je true práve vtedy ak je aspoň jeden z týchto testov je true. \ \\
 
 \begin{algorithmic}[1]
     \Function{is\_sentence}{$w[1 \dots n]$}
-        \State result = IN\_DICTIONARY($w[1 \dots n$]);
+        \State result = DICT($w[1 \dots n$]);
         \For{$i = 1 \dots n$}
-        	\State item = IS\_SENTENCE($w[1 \dots i]$) $\wedge$ IN\_DICTIONARY($w[i + 1 \dots n]$);
+        	\State item = IS\_SENTENCE($w[1 \dots i]$) $\wedge$ DICT($w[i + 1 \dots n]$);
 		\State result = result $\vee$ item;
         \EndFor
         \State \Return result;
@@ -137,61 +143,60 @@ Preto stačí vykonať iba lineárne množstvo volaní.
 Tieto volania sa dajú {\em usporiadať} tak, že sa funkcia postupné volá pre rastúci prefix. 
 Táto myšlienka je základom nasledujúcej dynamickej varianty funckie IS\_SENTENCE.\\
 
-Predstavme si nasledovný prípad
-Na vstup dostane algoritmus reťazec o dĺžke n.
-Pri overovaní jednotlivých rozdelení nájde slovo o dĺžke a (a zároveň sa rekurzívne zanorí na prefixe o dĺžke (n-a)) a ďalej pokračuje v overovaní ďalších rozdelení (s prefixami dĺžky (n-a+1),(n-a+2),...).
+Predstavme si nasledovný prípad: \ \\
+Na vstup dostane algoritmus reťazec o dĺžke n. \ \\
+Pri overovaní jednotlivých rozdelení nájde slovo o dĺžke a (a zároveň sa rekurzívne zanorí na prefixe o dĺžke (n-a)) a ďalej pokračuje v overovaní ďalších rozdelení (s prefixami dĺžky (n-a+1),(n-a+2),...). \ \\
 
 Algoritmus sa rekurzívne zavolá na reťazci o dĺžke n-a.
-Pri týchto volaniach však overuje prefixy s dĺžkami 1 .. n-a. Tieto prefixy však overoval aj predošlý priechod algoritmu.
+Pri týchto volaniach však overuje prefixy s dĺžkami 1 .. n-a. Tieto prefixy však overoval aj predošlý priechod algoritmu. \ \\
 
-Môžeme povedať, že volanie funkcie IS\_SENTENCE aplikované na reťazci dĺžky n je závislé na všetkých možných volaniach funkcie IS\_SENTENCE aplikovaných na prefixoch tohto reťazca.
+Môžeme povedať, že volanie funkcie IS\_SENTENCE aplikované na reťazci dĺžky n je závislé na všetkých možných volaniach funkcie IS\_SENTENCE aplikovaných na prefixoch tohto reťazca. \ \\
 
 Z tohoto dôvodu je výhodné, ak vypočítame IS\_SENTENCE na prefixoch pôvodného reťazca a výsledky týchto volaní si uložíme do rovnomenného asociatívneho poľa.
-Kľúč tohto poľa bude tvorený prefixom pôvodného reťazca, hodnota bude typu boolean.
+Kľúč tohto poľa bude tvorený prefixom pôvodného reťazca, hodnota bude typu boolean. \ \\
 
 
 \begin{algorithmic}[1]
-    \Function{is\_sentence}{$w[1 \dots n]$}
+    \Function{verify\_sentence}{$w[1 \dots n]$}
     \For{$i = 1 \dots n$}
-        \State result = IN\_DICTIONARY($w[1 \dots i]$);
+        \State item = [] of boolean
+	\State result = DICT($w[1 \dots i]$);
         \For{$j = 1 \dots i - 1$}
-                \State item = SENTENCE\_DATA($w[1 \dots j]$) $\wedge$ IN\_DICTIONARY($w[j + 1 \dots i - 1]$);
+                \State item = IS\_SENTENCE($w[1 \dots j]$) $\wedge$ DICT($w[j + 1 \dots i - 1]$);
 		\State result = result $\vee$ item;
         \EndFor
+	\State IS\_SENTENCE($w[1 \dots i]$) = result;
 	\EndFor
-	\State \Return result;
+	\State \Return  IS\_SENTENCE($w[1 \dots n]$);
     \EndFunction	
 \end{algorithmic}
 \ \\
  
-Korektnosť: 
+\section*{Korektnosť:}
 
-Konvergencia:
-Prvy cyklus sa vykoná pre každý prefix slova w.
-V cykle sa hodnota premennej i reprezentujucej dlžku prefixu pri každom priechode zvýši o 1 a iterovanie skončí, keď premenná i dosiahne hodnotu n.
+\subsection*{Konvergencia:}
+Prvý cyklus sa vykoná pre každý prefix slova $w$.
+V cykle sa hodnota premennej i reprezentujucej dlžku prefixu pri každom priechode zvýši o 1 a iterovanie skončí, keď premenná i dosiahne hodnotu n. \ \\
 
-Vnorený cyklus sa vykoná pre každý prefix tohto prefixu. 
+Vnorený cyklus sa vykoná pre každý prefix tohto prefixu. \ \\
 
-Jediné miesta, u ktorých hrozí, že algoritmus nezastaví, sú volania cyklov.
+Jediné miesta, u ktorých hrozí, že algoritmus nezastaví, sú volania cyklov. \ \\
 
 V cykle s iterujúcou premennou j sa zaručene pri každom priechode zvýši hodnota premennej j a iterovanie skončí, keď premenná j dosiahne hodnotu i-1.
 
-Parciálna korektnosť:
-Dôkaz, že algoritmus vráti true pri validnej postupnosti slov pomocou matematickej indukcie:
-1.) S0 = w0 je veta ktorá sa skladá z jedného slova w0 (w0 sa nachádza v slovníku). Pre takúto vetu vráti algoritmus true. Dôvod: položky subresults pre prvok IS\_SENTENCE(w0) budú obsahovať položku dict(w0), ktorá sa vyhodnotí na true. Na položky je aplikovaná funkcia logiký súčet a pretože obsahujú minimálne jednu položku z hodnotou true, algoritmus vráti true.
-	
-2.) Predpokladáme, že pre vetu s1 zloženú z k slov: s1 = w1.w2...wk vráti korektnú odpoveď true.
-	Predpokldáme, že pre vetu s2 zloženú s2 = s1.w(k +1) algoritmus taktiež vráti true.
-	Jeden z prefixov vety s2 musí byť reťazec zložený zo slov w1...wk.
-	Keďže algoritmus prechádza všetky prefixy, nastane situácia, jedna z položiek v poli subresults
-	pre prvok s2 bude IS\_SENTENCE(s1) logical\_and dict(w(k+1)).
-	
-	
-Dôkaz, že algoritmus vráti true pri nevalidnej postupnosti slov
+\subsection*{Parciálna korektnosť:}
+Dôkaz, že algoritmus vráti true pri validnej postupnosti slov pomocou matematickej indukcie: \ \\
 
+\textbf{Bázový krok:} \ \\
+ $S_0 = w_0$ je veta ktorá sa skladá z jedného slova $w_0$ ($w_0$ sa nachádza v slovníku). Pre takúto vetu vráti algoritmus true. Dôvod: položky subresults pre prvok $IS\_SENTENCE(w_0)$ budú obsahovať položku $dict(w_0)$, ktorá sa vyhodnotí na true. Na položky je aplikovaný operátor logiký súčet a pretože obsahujú minimálne jednu položku z hodnotou true, algoritmus vráti true. \ \\
 	
-	
-	
+\textbf{Indukčný krok:} \ \\
+Predpokladáme, že pre vetu s1 zloženú z k slov: $s1 = w_1.w_2...w_k$ vráti korektnú odpoveď true. \ \\
+
+Predpokldáme, že pre vetu $s_2$ zloženú $s_2 = s_1.w_{k +1}$ algoritmus taktiež vráti true. \ \\
+
+Jeden z prefixov vety $s2$ musí byť reťazec zložený zo slov $w_1...w_k$.
+Keďže algoritmus prechádza všetky prefixy, nastane situácia, jedna z položiek v poli subresults pre prvok s2 bude IS\_SENTENCE(s1) logical\_and dict(w(k+1)).
 	
 	
 	
@@ -199,13 +204,11 @@ Dôkaz, že algoritmus vráti true pri nevalidnej postupnosti slov
 
 
  
-Zložitosť:
-Cyklus s iterujúcou premennou i bude vykonaný n krát.
+\section*{Zložitosť}
+Cyklus s iterujúcou premennou i bude vykonaný n-krát. \ \\
 
 Vnorený cyklus s iterujúcou premennou j bude vykonaný (i-1) krát, a plaží, že (i-1) < n. Všetky operácie použité v ňom majú konštantnú zložitosť.
-Volanie apply logical\_or on subresults bude mať rovnakú zložitosť ako vnorený cyklus (vzhľadom k tomu, že počet jeho položiek zodpovedá počtu iterácií).
-
-$\mathcal{O}(n^2)$
+Celková zložitosť bude teda: $\mathcal{O}(n^2)$.
 
 \pagebreak
 
@@ -213,76 +216,87 @@ $\mathcal{O}(n^2)$
 %	Príklad 3
 %----------------------------------------------------------------------------------------
 
-\section*{Príklad 3}
+\section*{IV003 2014, Sada 2, Príklad 3}
+\subsection*{Jakub Senko (373902), Štefan Uherčík (374375)}
 
 Vstupom algoritmu bude:
-pole pravdepodobností: $C[p(1),..,p(n)]$\\
+pole pravdepodobností: $C[{p}_1,..,{p}_n]$\\
 $k$ - počet padnutých orlov\\
-PVD - pravdepodobnostná funkcia\\
-n
+PVD - pravdepodobnostná funkcia\ \\
+
 Problém je možné definovať nasledovne: 
-vypočíť pravdepodobnosť, že v poli padne k orlov z n mincí
+Vypočítať pravdepodobnosť, že v poli padne k orlov z n mincí
 
-táto pravdepodobnosť je ekvivaletná súčtu pravdepodobností nasledovných prípadov:
+Táto pravdepodobnosť je ekvivaletná súčtu pravdepodobností nasledovných prípadov: \ \\
 
-1.) pravdepodobnosť prípadu, že posledná minca bude orol
-táto pravdepodobnosť je ekvivalentná súčinu čísla p(n) a pravdepodobnosti, že medzi prvými n-1 mincami bude k-1 orlov
+1.) pravdepodobnosť prípadu, že posledná minca bude orol \ \\
+táto pravdepodobnosť je ekvivalentná súčinu čísla ${p}_n$ a pravdepodobnosti, že medzi prvými n-1 mincami bude k-1 orlov \ \\
 
-2.) pravdepodobnosť prípadu, že posledná minca nebude orol
-táto pravdepodobnosť je ekvivalentná súčinu čísla (1-p(n)) a pravdepodobnosti, že medzi prvými n-1 mincami bude k orlov
+2.) pravdepodobnosť prípadu, že posledná minca nebude orol \ \\
+táto pravdepodobnosť je ekvivalentná súčinu čísla $(1-{p}_n)$ a pravdepodobnosti, že medzi prvými n-1 mincami bude k orlov \ \\
 
-Tento poznatok nám umožňuje definovať jednoduchý rekurzívny algoritmus (v ktorm zároveň ošetrujeme krajné prípady n=k a n=0)
+Tento poznatok nám umožňuje definovať jednoduchý rekurzívny algoritmus (v ktorm zároveň ošetrujeme krajné prípady n=k a n=0) \ \\
 
 \begin{algorithmic}[1]
-    \Function{PVD}{C[p1,..,pn],k}
+    \Function{PVD}{$C[{p}_1,..,{p}_n],k$}
         \If{k=0}
-            \State \Return PVD(C[p(1),..,p(n-1)],0)*(1-p(n));
+            \State \Return $PVD(C[{p}_1,..,{p}_{n-1}],0)*(1-{p}_n)$;
         \EndIf
         \If{k=n}
-            \State \Return PVD(C[p(1),..,p(n-1)],k-1)*p(n);
+            \State \Return $PVD(C[{p}_1,..,{p}_{n-1}],k-1)*p(n)$;
         \EndIf
-        \State \Return PVD(C[p(1),..,p(n-1)],k-1)*p(n) + PVD(C[p(1),..,p(n-1)],k)*(1-p(n));
+        \State \Return $PVD(C[{p}_1,..,{p}_{n-1}],k-1)*{p}_{n} + PVD(C[{p}_1,..,{p}_{n-1}],k)*(1-{p}_{n})$;
     \EndFunction
 \end{algorithmic}
 \ \\
 
-Ak rozpíšeme vetvenie algoritmu vykonávanie bude vyzerať približne nasledovne
-PVD(C[p(1),..,p(n)],k) = PVD(C[p(1),..,p(n-1)],k-1)*p(n) + PVD(C[p(1),..,p(n-1)],k)*(1-p(n))
+Ak rozpíšeme vetvenie algoritmu vykonávanie bude vyzerať približne nasledovne: \ \\ \ \\
+$PVD(C[{p}_1,..,{p}_n],k) = PVD(C[{p}_1,..,{p}_{n-1}],k-1)*{p}_n + PVD(C[{p}_1,..,{p}_{n-1}],k)*(1-{p}_n)$ \ \\
 
-PVD(C[p(1),..,p(n-1)],k) = PVD(C[p(1),..,p(n-1)],k-1)*p(n-1) + PVD(C[p(1),..,p(n-1)],k)*(1-p(n-1))
+$PVD(C[{p}_1,..,{p}_{n-1}],k) = $ \ \\
+	$         PVD(C[{p}_1,..,{p}_{n-2}],k-1)*{p}_{n-1} + PVD(C{p}_1,..,{p}_{n-2}],k)*(1-{p}_{n-1}))$ \ \\
 
-PVD(C[p(1),..,p(n-1)],k-1) = PVD(C[p(1),..,p(n-1)],k-2)*p(n-1) + PVD(C[p(1),..,p(n-1)],k-1)*(1-p(n-1))
-
+$PVD(C[{p}_1,..,{p}_{n-1}],k-1) = $ \\ 
+	$         PVD(C[{p}_1,..,{p}_{n-2}],k-2)*{p}_{n-1} + PVD(C[{p}_1,..,{p}_{n-2}],k-1)*(1-{p}_{n-1})$
 ...
-Z predchádzajúceho zápisu volaní funkcií je možné vidieť, že PVD(C[p(1),..,p(n-1)],k-1) sa zavolá 2 krát na jednej úrovni rekurzívneho stromu.
+
+\ \\ 
+
+Z predchádzajúceho zápisu volaní funkcií je možné vidieť, že $PVD(C[{p}_1,..,{p}_{n-1}],k-1) $ sa zavolá 2 krát na druhej úrovni rekurzívneho stromu.
 Využijeme techniku dynamického programovania, aby sme sa vyhli opakovanému volaniu funkcie PVD na rovnakých parametroch.
-Z algoritmu je zreteľné, že volanie funkcie PVD, ktorá berie ako parameter pole o dĺžke a, je závislá výlučne na volaniach funkcií PVD, ktoré berú ako parameter pole o dĺžke a-1.
-Z tohoto dôvodu je výhodné, ak vypočítame najprv. funkcie s parametrami PVD(C[p(1)],0), PVD(C[p(1)],1), PVD(C[p(1),p(2)],0),... ,ich výsledky si budem ukladať do asociatívneho poľa a postupným volaním sa dopracujem k hodnote PVD(C[p(1),..,p(n)],k), ktorá je výsledkom celého problému.
+Z algoritmu je zreteľné, že volanie funkcie PVD, ktorá berie ako parameter pole o dĺžke a, je závislá výlučne na volaniach funkcií PVD, ktoré berú ako parameter pole o dĺžke a-1. \ \\
+
+Z tohoto dôvodu je výhodné, ak vypočítame najprv. funkcie s parametrami $PVD(C[{p}_{1})],0)$, $PVD(C[{p}_{1}],1)$, $PVD(C[p_1,p_2)],0)$,... \ \\
+ 
+
 Pre tento účel vytvoríme asociatívne pole s názvom PVD, v ktorom kľúče budú mať tvar:
 (C[p(1),..,p(n)],k)
 a hodnoty budú obsahovať napočítanú pravdepodobnosť.
 Na naplnenie tohto poľa vytvoríme jednoduchú nerekurzívnu funkciu:
 
+Ich výsledky si budem ukladať do asociatívneho poľa a postupným volaním sa dopracujem k hodnote PVD(C[p(1),..,p(n)],k), ktorá je výsledkom celého problému. \ \\
+
 
 \begin{algorithmic}[1]
-	\Function{countPVD}{C[p1,..,pn],k}
-		\State PVD([p(1)],0) = p1
-		\State PVD([p(1)],1) = (1-p1);
+	\Function{$COUNT\_PVD$}{$C[p_1,..,p_n],k$}
+		\State $PVD([p_1],0) = p_1$;
+		\State $PVD([p_1],1) = (1-p_1)$;
 
-		\For{i = 1 .. n}
+		\For{$i = 1 .. n$}
 			\State bottom = max(0,k-(n-i));
 			\State up = min(i,k);
 			\For{j = bottom .. up}
-				\If{k=0}
-					\State PVD(C[p(1),..,p(i-1)],0)*(1-p(i));
-				\Else \If{k=n}
-					\State PVD(C[p(1),..,p(i-1)],j-1)*p(i);
+				\If{j==0}
+					\State $PVD(C[p_1,..,p_{i}],j) = PVD(C[p_1,..,p_{i-1}],0)*(1-p_i);$
+				\Else \If{k==n}
+					\State $PVD(C[p_1,..,p_{i}],j) = PVD(C[p_1,..,p_{i-1}],j-1)*p_i;$
 				\Else 
-					\State PVD(C[p(1),..,p(i-1)],j-1)*p(i) + PVD(C[p(1),..,p(i-1)],j)*(1-p(i));
+					\State $PVD(C[p_1,..,p_{i}],j) = $
+					\State $PVD(C[p_1,..,p_{i-1}],j-1)*p_i + PVD(C[p_1,..,p_{i-1}],j)*(1-p_i);$
 				\EndIf \EndIf
 			\EndFor
 		\EndFor
-		\State \Return PVD(C[p(1),..,p(n-1)],k);
+		\State \Return $PVD(C[p_{1},..,p_{n}],k);$
 	\EndFunction
 \end{algorithmic}
 \ \\
@@ -299,17 +313,17 @@ Je zaručené, že k < n a teda zložitosť celého algoritmu bude patriť do tr
 %	Príklad 4
 %----------------------------------------------------------------------------------------
 
-\section*{Príklad 4}
-
-rekurzívny algoritmus
+\section*{IV003 2014, Sada 2, Príklad 4}
+\subsection*{Jakub Senko (373902), Štefan Uherčík (374375)}
 
 Cenu optimálneho rozdelenie áut do autosalónov je možné vypočítať pomocou jednoduchécho rekurzívneho algoritmu.
-Číslo auta je zároveň jeho index riadku v matici cien.
+Maticu C chápeme ako n trojíc, pričom každá je v samostnatnom riadku. Číslo auta je zároveň jeho index riadku v matici cien.
 Parameter n v algoritme bestPrice udáva počet áut ktoré ešte neboli priradené do autosalónu a kedže sa autá priradujú postupne, tak udáva zároveň aj číslo nasleujúceho nepriradeného auta.
 Parameter freePlaces udáva počet neobsadených miest v jednotlivých autosalónoch (číslo na indexe i v tomto poli udáva počet volných miest v autosalóne i).
 V každom rekurzívnom volaní priradíme auto do každého autosalónu az týchto priradení vrátime maximálnu cenu.
 Rekurzia sa zastaví v prípade že sme priradili už všetky autá.
-Predpokladáme že počet áut je delitelný počtom autsalónov.
+
+V nasledujúcich algoritmoch predpokladáme, že počet áut je delitelný počtom autsalónov. \ \\
 
 \begin{algorithmic}[1]
 \Function{best\_price}{n,freePlaces[]}
@@ -335,20 +349,13 @@ Predpokladáme že počet áut je delitelný počtom autsalónov.
 
 Každé volanie funkcie bestPrice na matici s počtom riadkov k potrebuje  výsledky volaní funkcie betPrice na matici s počtom riadkov k-1. Toto nám jasne definuje závislosť  a teda možné usporiadanie volaní.
 
-Vytvorím štruktúru bestPriceData, ktorá  bude mať typ asociatívneho poľa asociatívnych polí.
+Vytvoríme štruktúru bestPriceData, ktorá  bude mať typ asociatívneho poľa, v ktorom: / //
+kľúče budú zodpovedať možným parametrom funkcie best\_price - teda dvojica (n,freePlaces[])
+hodnoty budú zodpovedať vypočítanej najvyššej možnej cene
 
 
-Vonkašie asociatívne pole (BestPriceData)
-kľúč index riadku v matici C
-hodnota bude pole dvojíc PricesForFreePlaces
-
-Štruktúra PricesForFreePlaces takisto asociatívne pole
-kľúč bude typu freePlaces (pole čísel)
-hodnota bude typu price, číslo
-
-
-
-Aby sme zaznamenali všetky možné kombinácie parametrov n a freePlaces, vo funkcii bestPrice sme vytvorili funkciu findSpecialPermutations. Táto funkcia vráti všetky možnosti ako môže vyzeraž pole freePlaces pre sum áut v prípade že do jedného autosalónu môžeme daž maximálne threshold áut.
+Aby sme zaznamenali všetky možné kombinácie parametrov n a freePlaces, vo funkcii bestPrice sme vytvorili funkciu findSpecialPermutations. Táto funkcia vráti všetky možnosti ako môže vyzeraž pole freePlaces pre sum áut v prípade že do jedného autosalónu môžeme daž maximálne threshold áut. 
+Aby sme ju popísali viac formálne, pre vstupné parametre sum a threshold hľadáme permutácie trojice čísel, pričom tieto čísla sú prirodzené alebo 0. Tieto čísla musia dávať súčet rovný parametru sum, ale zároveň žiadne z nich nemôže byť väčšie, ako hodnota threshold. \ \\
 
 \begin{algorithmic}
 \Function{findSpecialPermutations}{sum,threshold} 
@@ -377,12 +384,10 @@ Aby sme zaznamenali všetky možné kombinácie parametrov n a freePlaces, vo fu
 	\State \Return permutations;
 \EndFunction
 \end{algorithmic}
-
 \ \\
-
 Nasledovná nerekurzívna funkcia postupne priradí do štruktúry bestPriceData hodnoty najlepších možných cien pre danú konfiguráciu.
 Vonkajší for cyklus s iterujúcou premennou i v každom priechode spocita maximalne ceny pre vsešetky distribucie pr i aut.
-Využívame hodnoty v bestPriceData vypočítané v predchádzajúcih priechodoch cyklom.
+Využívame hodnoty v bestPriceData vypočítané v predchádzajúcih priechodoch cyklom. \ \\
 
 
 \begin{algorithmic}[1]
@@ -412,39 +417,36 @@ Využívame hodnoty v bestPriceData vypočítané v predchádzajúcih priechodoc
 \EndFunction
 \end{algorithmic}
 
-Konvergencia
+\section*{Korektnosť}
+
+\subsection*{Konvergencia}
 Algoritmus môže nekonvergovať len pri vyhodnotení podmienky jedného z troch cyklov.
 Cyklus s iterujúcou premennou j sa skončí pretože permutation.size je kladná konštanta.
 Cyklus s iterujúcou premennou permutation skončí pretože funkcia findSpecialPermutations vráti konečný počet položiek.
 Vonkajší cyklus pretože C.rows je kladná konštanta.
 
 
-Parciálna korektnosť
-Dokážeme matematickou indukciou podla počtu áut pre ktorý sme už vypočítali maximalnu cenu (vonkajší cyklus).
+\subsection*{Parciálna korektnosť}
+Dokážeme matematickou indukciou podla počtu áut pre ktorý sme už vypočítali maximalnu cenu (vonkajší cyklus). \ \\
 
-Bázovy krok
+\textbf{Bázovy krok:} \ \\
 Pre i = 0
-Táto situácia je riešená pred cyklom naplnením pola bestPriceData hodnotou (0, [0,0,0]).
+Táto situácia je riešená pred cyklom naplnením pola bestPriceData hodnotou (0, [0,0,0]). \ \\ 
 
-Indukčný krok:
+\textbf{Indukčný krok:} \ \\
 Pre i = k
-Predpokladáme že bestPriceData obsahuje správne vypočítané maximálne ceny pre všetky možné konfigurácie freePlaces pre počet áut k , označme ich currentFreePlaces.
+Predpokladáme že bestPriceData obsahuje správne vypočítané maximálne ceny pre všetky možné konfigurácie freePlaces pre počet áut k , označme ich currentFreePlaces
 Vnútorný for cyklus s iterujúcou premennou permutation vypočíta maximálne ceny pre všetky možné konfigurácie freePlaces. Každá maximálna cena sa vypočíta ako maximum z už vypočítaných konfigurácii.
 Pretože for cyklus prebehne pre všetky možné permutácie pre k áut, budú dostupné pre k+1 iteráciu cyklu.
 
-Pre krátkost tento algoritmus počíta len výšku najlepšej ceny za akú je možné autá predať, ale je triviálne modfikovatelný aby si spolu s cenou pametal aj konkretne priradenie aut do autosalonov.
-Namiesto ceny je stačí uložiť do bestPriceData dvojicu (cena, priradenie). Priradenie je pole o dlžke C.rows a hodnota na indexe i v tomto poli vyjadruje číslo autosalónu do ktorého bude auto priradené, prípadne 0 ak eťe nie je priradené.
-
-Nasledujúci algoritmus toto implementuje:
-
-Zložitosť
-funkcia findSpecialPermutations
+\section{Zložitosť}
+\textbf{funkcia findSpecialPermutations} \ \\
 vo funkcii sa nachádzajú dva cykly:
 počet vykonaní prvého cyklu je (upper1 - bottom1), rozdiel týchto premenných bude vždy menší ako počet áut.
 Ekvivalentné tvrdenie môžeme spraviť pre druhý cyklus s počtom vykonaní (upper1 - bottom1).
-Každá operácia použitá v cykloch má konštantnú zložitosť, preto je jej celková zložitosť $\mathcal{O}(n^2)$.
+Každá operácia použitá v cykloch má konštantnú zložitosť, preto je jej celková zložitosť $\mathcal{O}(n^2)$. \ \\
 
-funkcia countBestPrice
+\textbf{funkcia countBestPrice} \ \\
 vonkajší cyklus sa vykoná pre každé auto práve raz, teda C.row krát.
 
 Zo zložistosti funkcie findSpecialPermutations môžeme povedať, že počet prvkov v poli permutations je maximálne kvadraticky závislý na premennej i.
@@ -454,6 +456,16 @@ Zložitosť cyklu s iterujúcou premennou permutation má preto zložitosť $\ma
 
 Predošlé tvrdenia môžeme zredukovať na tvrdenie, že v cykle s iterujúcou premennou i sa vždy vykonajú dve operácie so zložitosťou $\mathcal{O}(n^2)$.
 Jeho zložitosť je teda $\mathcal{O}(n^3)$.
+
+
+\section*{Rozšírenie algoritmu}
+
+Pre krátkosť tento algoritmus počíta len výšku najlepšej ceny za akú je možné autá predať, ale je triviálne modfikovatelný aby si spolu s cenou pametal aj konkretne priradenie áut do autosalónov.
+Namiesto ceny je stačí uložiť do bestPriceData dvojicu (cena, priradenie). Priradenie je pole o dlžke C.rows a hodnota na indexe i v tomto poli vyjadruje číslo autosalónu do ktorého bude auto priradené, prípadne 0 ak ešťe nie je priradené.
+
+Nasledujúci algoritmus toto implementuje: \ \\
+
+
 
 
 \begin{algorithmic}[1]
@@ -486,6 +498,8 @@ Jeho zložitosť je teda $\mathcal{O}(n^3)$.
 \EndFunction
 \end{algorithmic}
 
+\ \\
+
 Algoritmus je rozšíriteľný pre väčší počet autosalónov, je však potrebné zmeniť implementáciu funkcie findSpecialPermutations.
 
 \pagebreak
@@ -494,9 +508,10 @@ Algoritmus je rozšíriteľný pre väčší počet autosalónov, je však potre
 %	Príklad 5
 %----------------------------------------------------------------------------------------
 
-\section*{Príklad 5}
+\section*{IV003 2014, Sada 2, Príklad 5}
+\subsection*{Jakub Senko (373902), Štefan Uherčík (374375)}
 
-Hladový algoritmus nenájde správne riešenie pre druhý a tretí problém. \\
+Hladový algoritmus nemusí nájsť optimálne riešenie pre druhý a tretí problém. \\
 Protipríklad: \\
 Dokument s dĺžkou riadku: 12 \\
 Zoznam slov obsahuje slová s dĺžkami 5,4,4,12 \\
