@@ -93,17 +93,17 @@ ide len o vnútornú reprezentáciu za účelom zjednodušenia algoritmu. \\
 Uvažujme algoritmus MERGE, ktorý z reprezentácie dvoch budov vypočíta reprezentáciu ich siluety. \\
 \\
 Algoritmus využíva object BUILDING\_ITERATOR pomocou ktorého je možné postupne prechádzat reprezentáciou danej budovy. Obsahuje tri  metódy. \\
-NEXT\_COORDINATE\_EXISTS a NEXT\_COORDINATE\_POSITION sú triviálne a neposúvajú pozíciu iterátora. Tretia metóda, GET\_HEIGHT($x$) vráti výšku budovy na zadanej súradnici. Táto metóda spôsobí dostatočný posun iterátora v prípade, že zadaná pozícia je väčšia alebo rovná ako NEXT\_COORDINATE\_POSITION. Kedže iterátor je jednorázový, túto metódu je nie je možné zavolať s argumentom menším ako v predchádzajúcom volaní. Iterátor si jednoducho pamätá poslednú výšku. \\
+NEXT\_COORDINATE\_EXISTS a NEXT\_COORDINATE\_POSITION sú triviálne a neposúvajú pozíciu iterátora. Tretia metóda, GET\_HEIGHT($x$) vráti výšku budovy na zadanej súradnici. Táto metóda spôsobí dostatočný posun iterátora v prípade, že zadaná pozícia je väčšia alebo rovná ako NEXT\_COORDINATE\_POSITION\footnote{Ak iterátor prešiel všetky súradnice, NEXT\_COORDINATE\_POSITION vráti $\infty$ a GET\_HEIGHT je 0.}. Kedže iterátor je jednorázový, túto metódu nie je možné zavolať s argumentom menším ako v predchádzajúcom volaní. Iterátor si jednoducho pamätá poslednú výšku. \\
 \\
 Samotný MERGE pracuje s dvoma iterátormi, pre každú budovu jeden a výstup postupne ukladá do samostatného zoznamu. Základom je {\em while} smyčka, ktorá sa vykoná ak aspoň pre jeden s iterátorov platí NEXT\_COORDINATE\_EXISTS.
-Algoritmus potom vybere menšie $x$ z NEXT\_COORDINATE\_POSITION a zavolá metódu GET\_HEIGHT na oboch iterátoroch. Následne vybere väčšiu z výšok, $h$ a zavolá funkciu TRY\_ADD, ktorá jednoducho vloží novú súradnicu $(x, h)$ do výsledného zoznamu v prípade, že sa výška siluety zmenila (čo nemusí nastať). \\
+Algoritmus potom vybere menšie $x$ z NEXT\_COORDINATE\_POSITION a zavolá metódu GET\_HEIGHT na oboch iterátoroch. Následne vybere väčšiu z výšok, $h$ a zavolá funkciu TRY\_ADD, ktorá jednoducho vloží novú súradnicu $(x, h)$ do výsledného zoznamu v prípade, že sa výška siluety zmenila\footnote{Čo nemusí nastať}. \\
 \\
 Tento algoritmus funguje pre ľubovolné reprezentácie s dĺžkou $n_1, n_2$ v čase $\mathcal{O}(n_1 + n_2)$, čo je $\mathcal{O}(n)$ pre budovy s rovnako veľkou reprezentáciou. Zdôvodnenie je jednoduché - využíva jednosmerný iterátor na jedno použitie pre  každú reprezentáciu - a teda každú súradnicu spracuje práve raz. Algoritmus je konečný pretože pri každom priechode cyklom metóda GET\_HEIGHT posunie aspoň jeden z iterátorov. \\
 \\
 
 \subsection*{Rozdeľ a panuj}
 
-Výslednú siluetu dosiahneme aplikovaním funkcie MERGE na vhodné podproblémy. Toto delenie funguje rovnako ako pri algoritme {\em merge sort}. Funkcia COMPUTE\_SILHOUETTE zoberie ako argument množinu reprezentácii budov. Ak táto množina obsahuje jednu budovu, tak ju vráti. Ak dve budovy, zavolá na nich MERGE a vráti výsledok. Ak viac, rozdelí množinu na dve rovnaké (s rozdielom jednej budovy v prípade nepárneho počtu) množiny, rekurzívne sa na oboch zavolá a výsledok znovu spojí pomocou MERGE a vráti. Týmto spôsobom funkcia COMPUTE\_SILHOUETTE vždy vráti merge všetkých spojich argumentov (merge nezávisí na poradí). \\
+Výslednú siluetu dosiahneme aplikovaním funkcie MERGE na vhodné podproblémy. Toto delenie funguje rovnako ako pri algoritme {\em merge sort}. Funkcia COMPUTE\_SILHOUETTE zoberie ako argument množinu reprezentácii budov. Ak táto množina obsahuje jednu budovu, tak ju vráti. Ak dve budovy, zavolá na nich MERGE a vráti výsledok. Ak viac, rozdelí množinu na dve rovnaké (s rozdielom jednej budovy v prípade nepárneho počtu) množiny, rekurzívne sa na oboch zavolá a výsledok znovu spojí pomocou MERGE a vráti. Týmto spôsobom funkcia COMPUTE\_SILHOUETTE vždy vráti merge všetkých svojich argumentov (nezávisí na poradí). \\
 \\
 Zložitosť závisí na počte MERGE operácii a veľkosti ich vstupu. Na každej úrovni rekurzie je suma veľkosti všetkých reprezentácií rovnaká ($n$ dĺžky 2 na začiatku vs dve dlhé $n$ na konci, kde $n$ je počet budov) a počet úrovní je $\log_2 n$. Výsledná zložitosť je teda $\mathcal{O}(n \log n)$
 
@@ -144,13 +144,13 @@ Tieto volania sa dajú {\em usporiadať} tak, že sa funkcia postupné volá pre
 Táto myšlienka je základom nasledujúcej dynamickej varianty funckie IS\_SENTENCE.\\
 
 Predstavme si nasledovný prípad: \ \\
-Na vstup dostane algoritmus reťazec o dĺžke n. \ \\
-Pri overovaní jednotlivých rozdelení nájde slovo o dĺžke a (a zároveň sa rekurzívne zanorí na prefixe o dĺžke (n-a)) a ďalej pokračuje v overovaní ďalších rozdelení (s prefixami dĺžky (n-a+1),(n-a+2),...). \ \\
+Na vstup dostane algoritmus reťazec o dĺžke $n$. \ \\
+Pri overovaní jednotlivých rozdelení nájde slovo o dĺžke $a$ (a zároveň sa rekurzívne zanorí na prefixe o dĺžke $(n-a)$) a ďalej pokračuje v overovaní ďalších rozdelení (s prefixami dĺžky $(n-a+1), (n-a+2), \dots$). \ \\
 
-Algoritmus sa rekurzívne zavolá na reťazci o dĺžke n-a.
-Pri týchto volaniach však overuje prefixy s dĺžkami 1 .. n-a. Tieto prefixy však overoval aj predošlý priechod algoritmu. \ \\
+Algoritmus sa rekurzívne zavolá na reťazci o dĺžke $n-a$.
+Pri týchto volaniach však overuje prefixy s dĺžkami $1 \dots n-a$. Tieto prefixy však overoval aj predošlý priechod algoritmu. \ \\
 
-Môžeme povedať, že volanie funkcie IS\_SENTENCE aplikované na reťazci dĺžky n je závislé na všetkých možných volaniach funkcie IS\_SENTENCE aplikovaných na prefixoch tohto reťazca. \ \\
+Môžeme povedať, že volanie funkcie IS\_SENTENCE aplikované na reťazci dĺžky $n$ je závislé na všetkých možných volaniach funkcie IS\_SENTENCE aplikovaných na prefixoch tohto reťazca. \ \\
 
 Z tohoto dôvodu je výhodné, ak vypočítame IS\_SENTENCE na prefixoch pôvodného reťazca a výsledky týchto volaní si uložíme do rovnomenného asociatívneho poľa.
 Kľúč tohto poľa bude tvorený prefixom pôvodného reťazca, hodnota bude typu boolean. \ \\
@@ -159,7 +159,6 @@ Kľúč tohto poľa bude tvorený prefixom pôvodného reťazca, hodnota bude ty
 \begin{algorithmic}[1]
     \Function{verify\_sentence}{$w[1 \dots n]$}
     \For{$i = 1 \dots n$}
-        \State item = [] of boolean
 	\State result = DICT($w[1 \dots i]$);
         \For{$j = 1 \dots i - 1$}
                 \State item = IS\_SENTENCE($w[1 \dots j]$) $\wedge$ DICT($w[j + 1 \dots i - 1]$);
@@ -176,27 +175,27 @@ Kľúč tohto poľa bude tvorený prefixom pôvodného reťazca, hodnota bude ty
 
 \subsection*{Konvergencia:}
 Prvý cyklus sa vykoná pre každý prefix slova $w$.
-V cykle sa hodnota premennej i reprezentujucej dlžku prefixu pri každom priechode zvýši o 1 a iterovanie skončí, keď premenná i dosiahne hodnotu n. \ \\
+V cykle sa hodnota premennej $i$ reprezentujucej dlžku prefixu pri každom priechode zvýši o 1 a iterovanie skončí, keď premenná i dosiahne hodnotu $n$. \ \\
 
 Vnorený cyklus sa vykoná pre každý prefix tohto prefixu. \ \\
 
 Jediné miesta, u ktorých hrozí, že algoritmus nezastaví, sú volania cyklov. \ \\
 
-V cykle s iterujúcou premennou j sa zaručene pri každom priechode zvýši hodnota premennej j a iterovanie skončí, keď premenná j dosiahne hodnotu i-1.
+V cykle s iterujúcou premennou $j$ sa zaručene pri každom priechode zvýši hodnota premennej $j$ a iterovanie skončí, keď premenná dosiahne hodnotu $i-1$. Jedná sa o for-from-to cyklus, takže v prípade že je iniciálna hodnota $j$ väčšia ako $i-1$ tak sa cyklus nevykoná vôbec.
 
 \subsection*{Parciálna korektnosť:}
 Dôkaz, že algoritmus vráti true pri validnej postupnosti slov pomocou matematickej indukcie: \ \\
 
 \textbf{Bázový krok:} \ \\
- $S_0 = w_0$ je veta ktorá sa skladá z jedného slova $w_0$ ($w_0$ sa nachádza v slovníku). Pre takúto vetu vráti algoritmus true. Dôvod: položky subresults pre prvok $IS\_SENTENCE(w_0)$ budú obsahovať položku $dict(w_0)$, ktorá sa vyhodnotí na true. Na položky je aplikovaný operátor logiký súčet a pretože obsahujú minimálne jednu položku z hodnotou true, algoritmus vráti true. \ \\
+ $S_0 = w_0$ je veta ktorá sa skladá z jedného slova $w_0$ ($w_0$ sa nachádza v slovníku). Pre takúto vetu vráti algoritmus true. Dôvod: položky result pre prvok $IS\_SENTENCE(w_0)$ budú obsahovať položku $dict(w_0)$, ktorá sa vyhodnotí na true. Na položky je aplikovaný operátor logiký súčet a pretože obsahujú minimálne jednu položku z hodnotou true, algoritmus vráti true. \ \\
 	
 \textbf{Indukčný krok:} \ \\
-Predpokladáme, že pre vetu s1 zloženú z k slov: $s1 = w_1.w_2...w_k$ vráti korektnú odpoveď true. \ \\
+Predpokladáme, že pre vetu $s_1$ zloženú z $k$ slov: $s_1 = w_1.w_2...w_k$ vráti korektnú odpoveď true. \ \\
 
 Predpokldáme, že pre vetu $s_2$ zloženú $s_2 = s_1.w_{k +1}$ algoritmus taktiež vráti true. \ \\
 
-Jeden z prefixov vety $s2$ musí byť reťazec zložený zo slov $w_1...w_k$.
-Keďže algoritmus prechádza všetky prefixy, nastane situácia, jedna z položiek v poli subresults pre prvok s2 bude IS\_SENTENCE(s1) logical\_and dict(w(k+1)).
+Jeden z prefixov vety $s_2$ musí byť reťazec zložený zo slov $w_1...w_k$.
+Keďže algoritmus prechádza všetky prefixy, nastane situácia, jedna z položiek results pre prvok $s_2$ bude IS\_SENTENCE($s_1$) $\wedge$ DICT($w_{k+1}$).
 	
 	
 	
@@ -205,9 +204,9 @@ Keďže algoritmus prechádza všetky prefixy, nastane situácia, jedna z polož
 
  
 \section*{Zložitosť}
-Cyklus s iterujúcou premennou i bude vykonaný n-krát. \ \\
+Cyklus s iterujúcou premennou $i$ bude vykonaný $n$-krát. \ \\
 
-Vnorený cyklus s iterujúcou premennou j bude vykonaný (i-1) krát, a plaží, že (i-1) < n. Všetky operácie použité v ňom majú konštantnú zložitosť.
+Vnorený cyklus s iterujúcou premennou $j$ bude vykonaný $i-1$ krát, a plaží, že $i-1 < n$. Všetky operácie použité v ňom majú konštantnú zložitosť.
 Celková zložitosť bude teda: $\mathcal{O}(n^2)$.
 
 \pagebreak
@@ -224,28 +223,27 @@ pole pravdepodobností: $C[{p}_1,..,{p}_n]$\\
 $k$ - počet padnutých orlov\\
 PVD - pravdepodobnostná funkcia\ \\
 
-Problém je možné definovať nasledovne: 
-Vypočítať pravdepodobnosť, že v poli padne k orlov z n mincí
-
+Problém je možné definovať nasledovne: \\
+Vypočítať pravdepodobnosť, že v poli padne $k$ orlov z $n$ mincí.
 Táto pravdepodobnosť je ekvivaletná súčtu pravdepodobností nasledovných prípadov: \ \\
 
-1.) pravdepodobnosť prípadu, že posledná minca bude orol \ \\
-táto pravdepodobnosť je ekvivalentná súčinu čísla ${p}_n$ a pravdepodobnosti, že medzi prvými n-1 mincami bude k-1 orlov \ \\
+1.) Pravdepodobnosť prípadu, že posledná minca bude orol \ \\
+Táto pravdepodobnosť je ekvivalentná súčinu čísla ${p}_n$ a pravdepodobnosti, že medzi prvými $n-1$ mincami bude $k-1$ orlov. \ \\
 
 2.) pravdepodobnosť prípadu, že posledná minca nebude orol \ \\
-táto pravdepodobnosť je ekvivalentná súčinu čísla $(1-{p}_n)$ a pravdepodobnosti, že medzi prvými n-1 mincami bude k orlov \ \\
+táto pravdepodobnosť je ekvivalentná súčinu čísla $(1-{p}_n)$ a pravdepodobnosti, že medzi prvými $n-1$ mincami bude $k$ orlov. \ \\
 
-Tento poznatok nám umožňuje definovať jednoduchý rekurzívny algoritmus (v ktorm zároveň ošetrujeme krajné prípady n=k a n=0) \ \\
+Tento poznatok nám umožňuje definovať jednoduchý rekurzívny algoritmus (v ktorom zároveň ošetrujeme krajné prípady $n=k$ a $n=0$) \ \\
 
 \begin{algorithmic}[1]
     \Function{PVD}{$C[{p}_1,..,{p}_n],k$}
-        \If{k=0}
-            \State \Return $PVD(C[{p}_1,..,{p}_{n-1}],0)*(1-{p}_n)$;
+        \If{$k=0$}
+            \State \Return PVD($C[{p}_1,..,{p}_{n-1}],0)*(1-{p}_n$);
         \EndIf
-        \If{k=n}
-            \State \Return $PVD(C[{p}_1,..,{p}_{n-1}],k-1)*p(n)$;
+        \If{$k=n$}
+            \State \Return PVD($C[{p}_1,..,{p}_{n-1}],k-1)*p(n)$;
         \EndIf
-        \State \Return $PVD(C[{p}_1,..,{p}_{n-1}],k-1)*{p}_{n} + PVD(C[{p}_1,..,{p}_{n-1}],k)*(1-{p}_{n})$;
+        \State \Return PVD($C[{p}_1,..,{p}_{n-1}],k-1)*{p}_{n} + PVD(C[{p}_1,..,{p}_{n-1}],k)*(1-{p}_{n})$;
     \EndFunction
 \end{algorithmic}
 \ \\
@@ -300,11 +298,11 @@ Ich výsledky si budem ukladať do asociatívneho poľa a postupným volaním sa
 	\EndFunction
 \end{algorithmic}
 \ \\
-Zložitosť:
-Cyklus s iterujúcou premennou i sa vykoná n krát.
-V ňom sa vnorený cyklus iterujúcou premennou j vykoná vždy (up - bottom) krát.
-V každom cykle bude hodnota premennej bottom minimálne 0 a hodnota premennej up maximálne k, z čoho vyplýva, že počet týchto cyklov bude maximálne k.
-Je zaručené, že k < n a teda zložitosť celého algoritmu bude patriť do triedy $\mathcal{O}(n^2)$
+\section*{Zložitosť}
+Cyklus s iterujúcou premennou $i$ sa vykoná $n$-krát.
+V ňom sa vnorený cyklus iterujúcou premennou $j$ vykoná vždy $(up - bottom)$ krát.
+V každom cykle bude hodnota premennej $bottom$ minimálne 0 a hodnota premennej $up$ maximálne $k$, z čoho vyplýva, že počet týchto cyklov bude maximálne $k$.
+Je zaručené, že $k < n$ a teda zložitosť celého algoritmu bude patriť do triedy $\mathcal{O}(n^2)$
 
 
 \pagebreak
@@ -347,14 +345,14 @@ V nasledujúcich algoritmoch predpokladáme, že počet áut je delitelný počt
 
 \subsection*{Technika dynamického programovania}
 
-Každé volanie funkcie bestPrice na matici s počtom riadkov k potrebuje  výsledky volaní funkcie betPrice na matici s počtom riadkov k-1. Toto nám jasne definuje závislosť  a teda možné usporiadanie volaní.
+Každé volanie funkcie bestPrice na matici na k-tom riadku potrebuje  výsledky volaní funkcie bestPrice na riadkoch 1..k-1. Toto nám definuje závislosť  a teda možné usporiadanie volaní. \\
 
-Vytvoríme štruktúru bestPriceData, ktorá  bude mať typ asociatívneho poľa, v ktorom: / //
-kľúče budú zodpovedať možným parametrom funkcie best\_price - teda dvojica (n,freePlaces[])
-hodnoty budú zodpovedať vypočítanej najvyššej možnej cene
+Vytvoríme štruktúru bestPriceData, ktorá  bude mať typ asociatívneho poľa, v ktorom: \\
+Kľúče budú zodpovedať možným parametrom funkcie BEST\_PRICE - teda dvojica (n,freePlaces[])
+hodnoty budú zodpovedať vypočítanej najvyššej možnej cene. \\
 
 
-Aby sme zaznamenali všetky možné kombinácie parametrov n a freePlaces, vo funkcii bestPrice sme vytvorili funkciu findSpecialPermutations. Táto funkcia vráti všetky možnosti ako môže vyzeraž pole freePlaces pre sum áut v prípade že do jedného autosalónu môžeme daž maximálne threshold áut. 
+Aby sme zaznamenali všetky možné kombinácie parametrov n a freePlaces, vytvorili sme funkciu findSpecialPermutations. Táto funkcia vráti všetky možnosti ako môže vyzeraž pole freePlaces pre sum áut v prípade že do jedného autosalónu môžeme daž maximálne threshold áut. 
 Aby sme ju popísali viac formálne, pre vstupné parametre sum a threshold hľadáme permutácie trojice čísel, pričom tieto čísla sú prirodzené alebo 0. Tieto čísla musia dávať súčet rovný parametru sum, ale zároveň žiadne z nich nemôže byť väčšie, ako hodnota threshold. \ \\
 
 \begin{algorithmic}
@@ -385,8 +383,8 @@ Aby sme ju popísali viac formálne, pre vstupné parametre sum a threshold hľa
 \EndFunction
 \end{algorithmic}
 \ \\
-Nasledovná nerekurzívna funkcia postupne priradí do štruktúry bestPriceData hodnoty najlepších možných cien pre danú konfiguráciu.
-Vonkajší for cyklus s iterujúcou premennou i v každom priechode spocita maximalne ceny pre vsešetky distribucie pr i aut.
+Nasledovná nerekurzívna funkcia postupne priradí do štruktúry bestPriceData hodnoty najlepších možných cien pre danú konfiguráciu (počet priradených áut a počet predaných áut pre jednotlivé autosalóny (freePlaces)).
+Vonkajší for cyklus s iterujúcou premennou i v každom priechode spocita maximalne ceny pre všetky distribucie (konkrétne priradenie do autosalónov) i áut.
 Využívame hodnoty v bestPriceData vypočítané v predchádzajúcih priechodoch cyklom. \ \\
 
 
@@ -417,13 +415,11 @@ Využívame hodnoty v bestPriceData vypočítané v predchádzajúcih priechodoc
 \EndFunction
 \end{algorithmic}
 
-\section*{Korektnosť}
-
 \subsection*{Konvergencia}
 Algoritmus môže nekonvergovať len pri vyhodnotení podmienky jedného z troch cyklov.
 Cyklus s iterujúcou premennou j sa skončí pretože permutation.size je kladná konštanta.
 Cyklus s iterujúcou premennou permutation skončí pretože funkcia findSpecialPermutations vráti konečný počet položiek.
-Vonkajší cyklus pretože C.rows je kladná konštanta.
+Vonkajší cyklus skončí pretože C.rows je kladná konštanta.
 
 
 \subsection*{Parciálna korektnosť}
