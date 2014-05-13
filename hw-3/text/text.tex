@@ -95,15 +95,15 @@
 \section*{IV003 2014, Sada 3, Príklad 3}
 \subsection*{Jakub Senko (373902), Štefan Uherčík (374375)}
 
-Vstupom algoritmu je matica reprezentujuca zadany graf, kde cislo $G[i][j]$ je ohodnotenie hrany $i \to j$. Pre neexistujucu hranu zavedieme specialnu hodnotu $\perp$.
+V nasledovných algoritmoch je graf reprezentovaný maticou susednosti, kde $M[i][j]$ je ohodnotenie hrany $i \to j$. Neexistujúcu hranu ohodnotíme znakom $\perp$. Zadaný graf označme $G$. Predpokladáme že $G$ neobsahuje hrany $u \to u$.
 
 \subsection*{Reduce}
 
-Navrhneme funkciu REDUCE, ktora odstrani vrchol $node$ tak, aby sa nezmenila dlzka najkratsich ciet medzi ostatnymi vrcholmi.\\
+Navrhneme funkciu REDUCE, ktorá odstráni vrchol $node$ tak, aby sa nezmenilo ohodnotenie {\em najkratších ciest} medzi ostatnými vrcholmi.\\
 \ \\
-V pripade, ak vrcholom $node$ vedie najkratsia cesta $u \leadsto i \to node \to j \leadsto v$, je potrebne nahradit podcestu $i \to node \to j$ novou hranou $i \to j$ tak, aby $G[i][j] = G[i][node] + G[node][j]$. Ak hrana $i \to j$ uz existuje, staci ponechat hranu s nizsim ohodnotenim pretoze najkratsia cesta bude nutne obsahovat kratsiu hranu.\\
+Pre každú najkratšiu cestu $u \leadsto i \to node \to j \leadsto v$, je potrebné nahradiť podcestu $i \to node \to j$ novou hranou $i \to j$ tak, aby $G[i][j] = G[i][node] + G[node][j]$. Ak hrana $i \to j$ už existuje, stačí ponechať hranu s nižším ohodnotením.\\
 \ \\
-Tuto operaciu je nutne vykonat pre vsetky mozne podcesty prechadzajuce vrcholom $node$. Algoritmus teda obsahuje dva vnorene cykly. Vonkajsi cyklus iteruje cez vsetky vstupne hrany $i \to node$ a vnutorny cyklus cez vystupne hrany $node \to j$. Vo vnutornom cykle sa vytvori nova hrana alebo nahradi, ak je ohodnotenie nizsie ako existujuce. Po skonceni funkcie su vsetky ohodnotenia pre dany vrchol nastavene na $\perp$ co reprezentuje zrusenie vrcholu.\\
+Nahradenie je potrebné vykonať pre všetky možné podcesty, algoritmus teda obsahuje dva vnorené cykly. Vonkajší cyklus iteruje cez vstupné hrany $i \to node$ a vnútorný cez výstupné hrany $node \to j$. Po skončení REDUCE na vrchole $node$ sú všetky ohodnotenia jeho hrán nastavené na $\perp$ čo reprezentuje ich zrušenie.\\
 \ \\
 \begin{algorithmic}[1]
     \Function{REDUCE}{$G[1 \dots n][1 \dots n], node$}
@@ -126,17 +126,16 @@ Tuto operaciu je nutne vykonat pre vsetky mozne podcesty prechadzajuce vrcholom 
         \State \Return{$G$}
     \EndFunction
 \end{algorithmic}
-
-Zlozitost je $\mathcal{O}(n^2)$.
+\ \\
+Zlozitost je určená dvoma cyklami - $\mathcal{O}(n^2)$.
 
 \subsection*{AUGMENT}
 
-Predpokladame ze matica grafu najkratsich ciest $\mathcal{G}$ ma rovnake rozmery ako matica $G$ reprezentujuca povodny graf. Vsetky ohodnotenia hran v $\mathcal{G}$ su rovne dlzke najkratsej cesty medzi danymi vrcholmi. Neexistujuci vrchol je znovu reprezentovany tak, ze ohodnotenia vsetkych pripojenych hran su $\perp$.\\
+Predpokladáme že matica najkratších ciest $\mathcal{G}$ pre podmnožinu vrcholov $G$ má rovnaké rozmery ako $G$.  Vstupom nasledovného algoritmu je $G$, $\mathcal{G}$ a vrchol $node \in V_{G} \setminus V_{\mathcal{G}}$. Výstupom je matica najkratších ciest obsahujúca $node$.\\
 \ \\
-Vstupom nasledovneho algoritmu je povodny graf $G$, $\mathcal{G}$ a vrchol $node \in V_{G} \setminus V_{\mathcal{G}}$. Vysledkom algoritmu je matica najkratsich ciest obsahujuca $node$.\\
+Algoritmus je rozdelený na dve funkcie, zvlášť pre vstupné a pre výstupné hrany. Funkcie sú podobné, pre krátkosť teda popíšeme len AUGMENT\_OUT pre výstupné hrany:\\
 \ \\
-Funkcia je oddelena pre vstupne a vystupne hrany. Pre vystupne hrany:
-Nech $u \to v$ je hrana v $\mathcal{G}$ Pre kazdu hranu $node \to u$ v povodnom grafe $G$ pridame do $\mathcal{G}$ hranu $node \to v$ s ohodnotenim $G[node][u] +\mathcal{G}[u][v]$. Kedze vrchol u moze by rozny tak tato hrana uz moze existovat. Znovu pouzijeme nizsie ohodnotenie.\\
+Nech $u \to v$ je hrana v $\mathcal{G}$. Pre každú hranu $node \to u$ v grafe $G$ pridáme do $\mathcal{G}$ hranu $node \to v$ s ohodnotením $G[node][u] +\mathcal{G}[u][v]$. Kedže vrchol $u$ nie je unikátny, táto hrana už môže počas priebehu funkcie existovať. Znovu použijeme nižšie ohodnotenie.\\
 \ \\
 \begin{algorithmic}[1]
     \Function{AUGMENT\_OUT}{$G[1 \dots n][1 \dots n], \mathcal{G}[1 \dots n][1 \dots n], node$}
@@ -157,7 +156,7 @@ Nech $u \to v$ je hrana v $\mathcal{G}$ Pre kazdu hranu $node \to u$ v povodnom 
     \EndFunction
 \end{algorithmic}
 \ \\
-Podobne vyzera funkcia AUGMENT\_IN, jedinym rozdielom je zmena smeru hran. Pre kratkost vypis tejto funkcie vynecham. Vysledna funkcia AUGMENT je nasledovna\\
+Výsledná funkcia AUGMENT je nasledovná:\\
 \ \\
 \begin{algorithmic}[1]
     \Function{AUGMENT}{$G[1 \dots n][1 \dots n], \mathcal{G}[1 \dots n][1 \dots n], node$}
@@ -166,12 +165,12 @@ Podobne vyzera funkcia AUGMENT\_IN, jedinym rozdielom je zmena smeru hran. Pre k
         \State \Return{$\mathcal{G}$}
     \EndFunction
 \end{algorithmic}
+\ \\
+Zložitosť je určená dvoma vnorenými cyklami vo funkcii AUGMENT\_OUT/IN, teda $\mathcal{O}(n^2)$.
 
 \subsection*{COMPUTE}
 
-Zlozenim postupnosti operacii REDUCE na vrcholoch $1 \dots (n-2)$ a AUGMENT v opacnom poradi ziskame vyslednu maticu najkratsich ciest pre povodny graf $G$.
-
-Funkcia vyzera nasledovne:\\
+Zložením postupnosti operácií REDUCE na vrcholoch $1 \dots (n-2)$ a následne AUGMENT na vrcholoch v opačnom poradí získame výslednú maticu najkratších ciest pre pôvodný graf $G$:\\
 \ \\
 \begin{algorithmic}[1]
     \Function{COMPUTE}{$G[1 \dots n][1 \dots n]$}
@@ -179,12 +178,51 @@ Funkcia vyzera nasledovne:\\
         \For{$i \gets 1 \dots n - 2$}
             \State{$\mathcal{G} \gets REDUCE(G, \mathcal{G}, n)$}
         \EndFor
-        \For{$i \gets n - 2 \dots 1$}
+        \For{$i \gets (n - 2) \dots 1$}
             \State{$\mathcal{G} \gets AUGMENT(G, \mathcal{G}, n)$}
         \EndFor
         \State \Return{$\mathcal{G}$}
     \EndFunction
 \end{algorithmic}
+\ \\
+Kedže sa vo funkcii nachádza cyklus v ktorom sa opakovane volá funkcia REDUCE/AUGMENT so zložitosťou $\mathcal{O}(n^2)$, výsledná funkcia COMPUTE je $\mathcal{O}(n^3)$.
+
+\subsection*{NEGATIVE CYCLE DETECTION}
+
+Negatívny $k$-cyklus je cesta $u \leadsto u$ v tvare $u_1 \to \dots \to u_k \to u_1$ ktorej celkové ohodnotenie je záporné. $G$ obsahuje negatívny cyklus $\iff$ ak po vykonaní REDUCE na vrcholoch $u_2, \dots, u_{k-1}$ redukovaný graf obsahuje negatívny $2$-cyklus v tvare $u_1 \to u_k \to u_1$.\\
+\ \\
+Táto situácia je jednoducho detekovatelná pri opätovnom vykonaní REDUCE na $u_1$ alebo $u_k$. Kedže funkcia COMPUTE vykoná redukciu $(n-2)$-krát, jediný špeciálny prípad nastane ak $u_1$ a $u_k$ su práve posledné dva vrcholy na ktoré sa už REDUCE neaplikuje. Nasledujú výpisy obsahujúce zmeny:\\
+\ \\
+\begin{algorithmic}[1]
+    \Function{REDUCE\_NCD}{$G[1 \dots n][1 \dots n], node$}
+        \State{$\vdots$}
+        \If{$G[i][j] = \perp \vee \ G[i][j] > cost$}
+            \State{$G[i][j] \gets cost$}
+            \If{$G[j][i] \neq \perp \wedge \ G[i][j] + G[j][i] < 0$}
+                \State \Return{$\perp$}
+            \EndIf    
+        \EndIf
+        \State{$\vdots$}
+    \EndFunction
+\end{algorithmic}
+\ \\
+\begin{algorithmic}[1]
+    \Function{COMPUTE\_NCD}{$G[1 \dots n][1 \dots n]$}
+        \State{$\mathcal{G} \gets \mathbf{copy}\ G$}
+        \For{$i \gets 1 \dots (n - 2)$}
+            \State{$\mathcal{G} \gets REDUCE\_NCD(G, \mathcal{G}, n)$}
+            \If{$\mathcal{G} = \perp$}
+                \State \Return{$\perp$}
+            \EndIf
+        \EndFor
+        \If{$G[n - 1][n] + G[n][n - 1] < 0$}
+            \State \Return{$\perp$}
+        \EndIf
+        \State{$\vdots$}
+    \EndFunction
+\end{algorithmic}
+\ \\
+Ak matica najkratších ciest neexistuje, algoritmus vráti $\perp$.
 
 \pagebreak
 
