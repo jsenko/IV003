@@ -1,0 +1,200 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Short Sectioned Assignment
+% LaTeX Template
+% Version 1.0 (5/5/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Frits Wenneker (http://www.howtotex.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[paper=a4, fontsize=11pt]{scrartcl} % A4 paper and 11pt font size
+
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+% \usepackage{fourier} % Use the Adobe Utopia font for the document - comment this line to return to the LaTeX default
+\usepackage[slovak]{babel} % Slovak language/hyphenation
+\usepackage[utf8]{inputenc}
+% \usepackage[IL2]{fontenc}
+\usepackage{amsmath,amsfonts,amsthm} % Math packages
+\usepackage{algpseudocode}
+\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+
+\usepackage{sectsty} % Allows customizing section commands
+\allsectionsfont{\centering \normalfont\scshape} % Make all sections centered, the default font and small caps
+
+\usepackage{fancyhdr} % Custom headers and footers
+\pagestyle{fancyplain} % Makes all pages in the document conform to the custom headers and footers
+\fancyhead{} % No page header - if you want one, create it in the same way as the footers below
+\fancyfoot[L]{} % Empty left footer
+\fancyfoot[C]{} % Empty center footer
+\fancyfoot[R]{\thepage} % Page numbering for right footer
+\renewcommand{\headrulewidth}{0pt} % Remove header underlines
+\renewcommand{\footrulewidth}{0pt} % Remove footer underlines
+\setlength{\headheight}{13.6pt} % Customize the height of the header
+
+\numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{table}{section} % Number tables within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs - comment this line for an assignment with lots of text
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} % Create horizontal rule command with 1 argument of height
+
+\title{	
+\normalfont \normalsize 
+\textsc{IV003, Fakulta Informatiky, Masarykova Univerzita} \\ [25pt] % Your university, school and/or department name(s)
+\horrule{0.5pt} \\[0.4cm] % Thin top horizontal rule
+\huge Homework 3 \\ % The assignment title
+\horrule{2pt} \\[0.5cm] % Thick bottom horizontal rule
+}
+
+\author{Jakub Senko, Štefan Uherčík} % Your name
+
+\date{\normalsize\today} % Today's date or a custom date
+
+\begin{document}
+
+%\maketitle  Print the title
+
+%----------------------------------------------------------------------------------------
+%	Príklad 1
+%----------------------------------------------------------------------------------------
+
+\section*{IV003 2014, Sada 3, Príklad 1}
+\subsection*{Jakub Senko (373902), Štefan Uherčík (374375)}
+
+\pagebreak
+
+%----------------------------------------------------------------------------------------
+%	Príklad 2
+%----------------------------------------------------------------------------------------
+
+\section*{IV003 2014, Sada 3, Príklad 2}
+\subsection*{Jakub Senko (373902), Štefan Uherčík (374375)}
+
+\pagebreak
+
+%----------------------------------------------------------------------------------------
+%	Príklad 3
+%----------------------------------------------------------------------------------------
+
+\section*{IV003 2014, Sada 3, Príklad 3}
+\subsection*{Jakub Senko (373902), Štefan Uherčík (374375)}
+
+Vstupom algoritmu je matica reprezentujuca zadany graf, kde cislo $G[i][j]$ je ohodnotenie hrany $i \to j$. Pre neexistujucu hranu zavedieme specialnu hodnotu $\perp$.
+
+\subsection*{Reduce}
+
+Navrhneme funkciu REDUCE, ktora odstrani vrchol $node$ tak, aby sa nezmenila dlzka najkratsich ciet medzi ostatnymi vrcholmi.\\
+\ \\
+V pripade, ak vrcholom $node$ vedie najkratsia cesta $u \leadsto i \to node \to j \leadsto v$, je potrebne nahradit podcestu $i \to node \to j$ novou hranou $i \to j$ tak, aby $G[i][j] = G[i][node] + G[node][j]$. Ak hrana $i \to j$ uz existuje, staci ponechat hranu s nizsim ohodnotenim pretoze najkratsia cesta bude nutne obsahovat kratsiu hranu.\\
+\ \\
+Tuto operaciu je nutne vykonat pre vsetky mozne podcesty prechadzajuce vrcholom $node$. Algoritmus teda obsahuje dva vnorene cykly. Vonkajsi cyklus iteruje cez vsetky vstupne hrany $i \to node$ a vnutorny cyklus cez vystupne hrany $node \to j$. Vo vnutornom cykle sa vytvori nova hrana alebo nahradi, ak je ohodnotenie nizsie ako existujuce. Po skonceni funkcie su vsetky ohodnotenia pre dany vrchol nastavene na $\perp$ co reprezentuje zrusenie vrcholu.\\
+\ \\
+\begin{algorithmic}[1]
+    \Function{REDUCE}{$G[1 \dots n][1 \dots n], node$}
+        \For{$i \gets 1 \dots n$}
+            \If{$G[i][node] \neq \perp \wedge \ i \neq node$}
+                \For{$j \gets 1 \dots n$}
+                   \If{$G[node][j] \neq \perp \wedge \ j \neq node$}
+                       \State{$cost \gets G[i][node] + G[node][j]$}
+                       \If{$G[i][j] = \perp \vee \ G[i][j] > cost$}
+                           \State{$G[i][j] \gets cost$}
+                       \EndIf
+                   \EndIf
+                \EndFor                
+                \State{$G[i][node] \gets \perp$}
+            \EndIf            
+        \EndFor
+       \For{$j \gets 1 \dots n$}
+           \State{$G[node][j] \gets \perp$}
+       \EndFor
+        \State \Return{$G$}
+    \EndFunction
+\end{algorithmic}
+
+Zlozitost je $\mathcal{O}(n^2)$.
+
+\subsection*{AUGMENT}
+
+Predpokladame ze matica grafu najkratsich ciest $\mathcal{G}$ ma rovnake rozmery ako matica $G$ reprezentujuca povodny graf. Vsetky ohodnotenia hran v $\mathcal{G}$ su rovne dlzke najkratsej cesty medzi danymi vrcholmi. Neexistujuci vrchol je znovu reprezentovany tak, ze ohodnotenia vsetkych pripojenych hran su $\perp$.\\
+\ \\
+Vstupom nasledovneho algoritmu je povodny graf $G$, $\mathcal{G}$ a vrchol $node \in V_{G} \setminus V_{\mathcal{G}}$. Vysledkom algoritmu je matica najkratsich ciest obsahujuca $node$.\\
+\ \\
+Funkcia je oddelena pre vstupne a vystupne hrany. Pre vystupne hrany:
+Nech $u \to v$ je hrana v $\mathcal{G}$ Pre kazdu hranu $node \to u$ v povodnom grafe $G$ pridame do $\mathcal{G}$ hranu $node \to v$ s ohodnotenim $G[node][u] +\mathcal{G}[u][v]$. Kedze vrchol u moze by rozny tak tato hrana uz moze existovat. Znovu pouzijeme nizsie ohodnotenie.\\
+\ \\
+\begin{algorithmic}[1]
+    \Function{AUGMENT\_OUT}{$G[1 \dots n][1 \dots n], \mathcal{G}[1 \dots n][1 \dots n], node$}
+        \State{$\mathcal{G}[node][node] \gets 0$}
+        \For{$u \gets 1 \dots n$}
+            \If{$G[node][u] \neq \perp \wedge \ u \neq node$}
+                \For{$v \gets 1 \dots n$}
+                    \If{$\mathcal{G}[u][v] \neq \perp \wedge \ v \neq node$}
+                        \State{$cost \gets G[node][u] + \mathcal{G}[u][v]$}
+                        \If{$\mathcal{G}[node][v] = \perp \vee \ \mathcal{G}[node][v] > cost$}
+                            \State{$\mathcal{G}[node][v] \gets cost$}
+                        \EndIf
+                    \EndIf
+                \EndFor
+            \EndIf
+        \EndFor
+        \State \Return{$\mathcal{G}$}
+    \EndFunction
+\end{algorithmic}
+\ \\
+Podobne vyzera funkcia AUGMENT\_IN, jedinym rozdielom je zmena smeru hran. Pre kratkost vypis tejto funkcie vynecham. Vysledna funkcia AUGMENT je nasledovna\\
+\ \\
+\begin{algorithmic}[1]
+    \Function{AUGMENT}{$G[1 \dots n][1 \dots n], \mathcal{G}[1 \dots n][1 \dots n], node$}
+        \State{$\mathcal{G} \gets AUGMENT\_IN(G, \mathcal{G}, node)$}
+        \State{$\mathcal{G} \gets AUGMENT\_OUT(G, \mathcal{G}, node)$}
+        \State \Return{$\mathcal{G}$}
+    \EndFunction
+\end{algorithmic}
+
+\subsection*{COMPUTE}
+
+Zlozenim postupnosti operacii REDUCE na vrcholoch $1 \dots (n-2)$ a AUGMENT v opacnom poradi ziskame vyslednu maticu najkratsich ciest pre povodny graf $G$.
+
+Funkcia vyzera nasledovne:\\
+\ \\
+\begin{algorithmic}[1]
+    \Function{COMPUTE}{$G[1 \dots n][1 \dots n]$}
+        \State{$\mathcal{G} \gets \mathbf{copy}\ G$}
+        \For{$i \gets 1 \dots n - 2$}
+            \State{$\mathcal{G} \gets REDUCE(G, \mathcal{G}, n)$}
+        \EndFor
+        \For{$i \gets n - 2 \dots 1$}
+            \State{$\mathcal{G} \gets AUGMENT(G, \mathcal{G}, n)$}
+        \EndFor
+        \State \Return{$\mathcal{G}$}
+    \EndFunction
+\end{algorithmic}
+
+\pagebreak
+
+%----------------------------------------------------------------------------------------
+%	Príklad 4
+%----------------------------------------------------------------------------------------
+
+\section*{IV003 2014, Sada 3, Príklad 4}
+\subsection*{Jakub Senko (373902), Štefan Uherčík (374375)}
+
+
+
+\end{document}
